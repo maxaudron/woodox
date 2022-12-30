@@ -1,0 +1,6 @@
+(sym_lib_table
+  (lib (name "LM3940IMPX-3.3_NOPB")(type "KiCad")(uri "${KIPRJMOD}/lib/LM3940IMPX-3.3_NOPB.kicad_sym")(options "")(descr ""))
+  (lib (name "ECS-2520MV-080-CN-TR")(type "KiCad")(uri "${KIPRJMOD}/lib/ECS-2520MV-080-CN-TR.kicad_sym")(options "")(descr ""))
+  (lib (name "W25Q16JVUXIQ_TR")(type "Legacy")(uri "${KIPRJMOD}/lib/W25Q16JVUXIQ_TR.lib")(options "")(descr ""))
+  (lib (name "IS31FL3741A-QFLS4-TR")(type "Legacy")(uri "${KIPRJMOD}/lib/IS31FL3741A-QFLS4-TR.lib")(options "")(descr ""))
+)

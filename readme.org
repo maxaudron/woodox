@@ -1,0 +1,44 @@
+#+title: Readme
+
+* Parts
+LED Controller https://jlcpcb.com/partdetail/3305937-IS31FL3741A_QFLS4TR/C2940604
+
+Multiplexer https://www.ti.com/lit/ds/symlink/cd74hc4067.pdf
+
+Example rp2040 usage https://proto-pic.co.uk/content/RPI-PICO-R3-PUBLIC-SCHEMATIC.pdf
+
+rp2040 https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf
+
+** Hall Sensor
+https://www.ti.com/sensors/magnetic-sensors/linear-hall-effect-sensors/overview.html
+
+DRV5055A3 SOT-23
+https://www.ti.com/lit/ds/symlink/drv5055.pdf?ts=1672207827147&ref_url=https%253A%252F%252Fwww.ti.com%252Fproduct%252FDRV5055%252Fpart-details%252FDRV5055A1QLPG
+
+35 keys per side
+
+DRV5057
+https://www.ti.com/lit/ds/symlink/drv5057.pdf?ts=1672321537787&ref_url=https%253A%252F%252Fwww.ti.com%252Fsensors%252Fmagnetic-sensors%252Flinear-hall-effect-sensors%252Fproducts.html
+
+
+13,200 Gauss
+1320mT
+
+3.5mm diameter x 4 thiccness
+
+Divide[13200,2](Divide[D + 4mm,Sqrt[Power[\(40)0.5 * 3.5mm\(41),2]+ \(40)D + 4mm\(41)]] - Divide[D,Sqrt[Power[\(40)0.5 * 3.5mm\(41),2]+ Power[D,2]]])
+
+
+#+begin_src gnuplot
+B = 1480
+C = 4.7625
+T = 12.7
+
+plot [D = -20 :20] (B/2)*( ( ( D + T ) / sqrt( (0.5*C)**2 + (D+T)**2 ) ) - ( D / sqrt(0.5*C)**2 + D**2 ) )
+#+end_src
+
+https://crocus-technology.com/basic-magnetic-field-calculator/
+
+Hi, i'm designing a keyboard and would like to know the kind of Magnet and what Grade are used in the lekker switches, or the Residual Flux Density of it, to select an appropriate hall sensor.
+
+What kind of Magnet and what Grade are used in the lekker switches? Or alternatively what's the residual flux density of them?
