@@ -1,0 +1,3 @@
+[submodule "woodox/marbastlib"]
+	path = woodox/marbastlib
+	url = https://github.com/ebastler/marbastlib

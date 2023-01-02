@@ -20,6 +20,8 @@ https://www.ti.com/lit/ds/symlink/drv5055.pdf?ts=1672207827147&ref_url=https%253
 DRV5057
 https://www.ti.com/lit/ds/symlink/drv5057.pdf?ts=1672321537787&ref_url=https%253A%252F%252Fwww.ti.com%252Fsensors%252Fmagnetic-sensors%252Flinear-hall-effect-sensors%252Fproducts.html
 
+https://www.digikey.de/en/product-highlight/s/sunled/reverse-mount-rgb-plcc-smd-led
+
 
 13,200 Gauss
 1320mT

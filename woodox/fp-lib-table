@@ -1,6 +1,7 @@
 (fp_lib_table
-  (lib (name "SOT230P700X180-4N")(type "KiCad")(uri "${KIPRJMOD}/lib/SOT230P700X180-4N.kicad_mod")(options "")(descr ""))
-  (lib (name "OSC_ECS-2520S25-250-FN-TR")(type "KiCad")(uri "${KIPRJMOD}/lib/OSC_ECS-2520S25-250-FN-TR.kicad_mod")(options "")(descr ""))
   (lib (name "W25Q16JVUXIQ_TR")(type "Legacy")(uri "${KIPRJMOD}/lib/W25Q16JVUXIQ_TR.mod")(options "")(descr ""))
   (lib (name "IS31FL3741A-QFLS4-TR")(type "Legacy")(uri "${KIPRJMOD}/lib/IS31FL3741A-QFLS4-TR.mod")(options "")(descr ""))
+  (lib (name "marbastlib-various")(type "KiCad")(uri "${KIPRJMOD}/marbastlib/marbastlib-various.pretty")(options "")(descr ""))
+  (lib (name "marbastlib-mx")(type "KiCad")(uri "${KIPRJMOD}/marbastlib/marbastlib-mx.pretty")(options "")(descr ""))
+  (lib (name "lib")(type "KiCad")(uri "${KIPRJMOD}/lib")(options "")(descr ""))
 )
