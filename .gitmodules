@@ -1,3 +1,6 @@
-[submodule "woodox/marbastlib"]
-	path = woodox/marbastlib
+[submodule "kicad_lib/marbastlib"]
+	path = kicad_lib/marbastlib
 	url = https://github.com/ebastler/marbastlib
+[submodule "kicad_lib/oled"]
+	path = kicad_lib/oled
+	url = https://github.com/MichMich/KiCad-SSD1306_OLED-0.91-128x32

@@ -5,4 +5,6 @@
   (lib (name "IS31FL3741A-QFLS4-TR")(type "Legacy")(uri "${KIPRJMOD}/../kicad_lib/IS31FL3741A-QFLS4-TR.lib")(options "")(descr ""))
   (lib (name "marbastlib-various")(type "KiCad")(uri "${KIPRJMOD}/../kicad_lib/marbastlib/marbastlib-various.kicad_sym")(options "")(descr ""))
   (lib (name "marbastlib-mx")(type "KiCad")(uri "${KIPRJMOD}/../kicad_lib/marbastlib/marbastlib-mx.kicad_sym")(options "")(descr ""))
+  (lib (name "SSD1306_OLED-0.91-128x32")(type "Legacy")(uri "${KIPRJMOD}/../kicad_lib/oled/SSD1306_OLED-0.91-128x32.lib")(options "")(descr ""))
+  (lib (name "oled_256x64_i2c")(type "KiCad")(uri "/home/audron/repo/gitlab.com/cocainefarm/redox_wooting/kicad_lib/oled_256x64_i2c.kicad_sym")(options "")(descr ""))
 )
