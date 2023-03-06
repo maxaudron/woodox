@@ -6,3 +6,8 @@ tmp/
 /target
 /result
 /.direnv
+
+/macropad/macropad-backups/
+/macropad/production
+/macropad/output
+/macropad/bom

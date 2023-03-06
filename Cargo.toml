@@ -17,8 +17,19 @@ panic-probe = { version = "0.3", features = ["print-defmt"] }
 # but you can use any BSP. Uncomment this to use the pro_micro_rp2040 BSP instead
 # sparkfun-pro-micro-rp2040 = "0.3"
 
-rp2040-hal = { version="0.6", features=["rt"] }
+rp2040-hal = { version="0.8", features=["rt", "critical-section-impl"] }
 rp2040-boot2 = "0.2"
+
+ws2812-pio = "0.6"
+smart-leds = "0.3"
+
+critical-section = "*"
+
+[patch.crates-io]
+rp2040-hal = { path = "../../../github.com/maxaudron/rp-hal/rp2040-hal" }
+
+[dev-dependencies]
+embedded-hal-mock = "0.9"
 
 # cargo build/run
 [profile.dev]
