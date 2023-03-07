@@ -1,5 +1,5 @@
-use embedded_hal::digital::v2::OutputPin;
 use core::fmt::Debug;
+use embedded_hal::digital::v2::OutputPin;
 
 pub struct CD74HC4067<A, B, C, D> {
     pin_0: A,

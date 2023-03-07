@@ -31,6 +31,10 @@ rp2040-hal = { path = "../../../github.com/maxaudron/rp-hal/rp2040-hal" }
 [dev-dependencies]
 embedded-hal-mock = "0.9"
 
+[features]
+# Timer to gather some benchmarks during runtime
+timers = []
+
 # cargo build/run
 [profile.dev]
 codegen-units = 1

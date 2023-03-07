@@ -14,25 +14,15 @@ use defmt::debug;
 
 use crate::{multiplexer::CD74HC4067, DMA_BUF_SIZE};
 
-pub static GLOBAL_DMA: Mutex<RefCell<Option<(dma::Channels, ADC)>>> =
-    Mutex::new(RefCell::new(None));
-
-pub type MUX = CD74HC4067<
-    Pin<Gpio4, Output<PushPull>>,
-    Pin<Gpio3, Output<PushPull>>,
-    Pin<Gpio2, Output<PushPull>>,
-    Pin<Gpio1, Output<PushPull>>,
->;
-pub static GLOBAL_MUX: Mutex<RefCell<Option<MUX>>> = Mutex::new(RefCell::new(None));
+pub static GLOBAL_DMA: Mutex<RefCell<Option<dma::Channels>>> = Mutex::new(RefCell::new(None));
 
 pub trait InitializeDMA {
-    fn initialize(self, adc: ADC);
+    fn initialize(self, buf: u32, adc: u32);
 }
 
 impl InitializeDMA for Channels {
-    fn initialize(mut self, adc: ADC) {
+    fn initialize(mut self, buf: u32, adc: u32) {
         self.ch0.listen_irq0();
-        self.ch1.listen_irq0();
 
         // -----------------------------
         // Configure DMA Channel 0
@@ -40,14 +30,15 @@ impl InitializeDMA for Channels {
         dma0.ch_al3_ctrl.modify(|_, w| w.en().set_bit());
         dma0.ch_al3_ctrl.modify(|_, w| w.ring_sel().set_bit());
         dma0.ch_al3_ctrl
-            .modify(|_, w| unsafe { w.ring_size().bits(8) });
-        dma0.ch_al3_ctrl
-            .modify(|_, w| unsafe { w.chain_to().bits(1) });
+            .modify(|_, w| unsafe { w.ring_size().bits(DMA_BUF_SIZE as u8) });
         dma0.ch_al3_ctrl.modify(|_, w| w.data_size().size_byte());
         dma0.ch_al3_ctrl.modify(|_, w| w.treq_sel().adc());
         dma0.ch_al3_ctrl.modify(|_, w| w.incr_write().set_bit());
         dma0.ch_al3_trans_count
-            .write(|w| unsafe { w.bits(u32::MAX) });
+            .write(|w| unsafe { w.bits(4) });
+        dma0.ch_al3_write_addr.write(|w| unsafe { w.bits(buf) });
+        dma0.ch_al3_read_addr_trig
+            .write(|w| unsafe { w.bits(adc) });
 
         // dma0.ch_al3_write_addr
         //     .modify(|_, w| unsafe { w.bits(& as *const _ as u32) });
@@ -71,15 +62,9 @@ impl InitializeDMA for Channels {
 
         // -----------------------------
         // Start DMA Channel 0
-        dma0.ch_al3_read_addr_trig
-            .modify(|_, w| unsafe { w.bits(&adc.fifo as *const _ as u32) });
-
-        // -----------------------------
-        // Start ADC
-        adc.cs.modify(|_, w| w.start_many().set_bit());
 
         critical_section::with(|cs| {
-            GLOBAL_DMA.borrow(cs).replace(Some((self, adc)));
+            GLOBAL_DMA.borrow(cs).replace(Some(self));
         });
 
         unsafe {
@@ -88,17 +73,11 @@ impl InitializeDMA for Channels {
     }
 }
 
-// static mut BUF0: [u8; DMA_BUF_SIZE] = [0; DMA_BUF_SIZE];
-// static mut BUF1: [u8; DMA_BUF_SIZE] = [0; DMA_BUF_SIZE];
-
 #[interrupt]
 fn DMA_IRQ_0() {
-    static mut BUF: [[u8; DMA_BUF_SIZE]; 8] = [[0; DMA_BUF_SIZE]; 8];
-    static mut DMA: Option<(dma::Channels, ADC)> = None;
-    static mut mux: Option<MUX> = None;
-    static mut POSITION: u8 = 6;
+    static mut DMA: Option<dma::Channels> = None;
 
-    debug!("triggered interupt");
+    debug!("dma triggered interrupt");
 
     if DMA.is_none() {
         critical_section::with(|cs| {
@@ -106,49 +85,13 @@ fn DMA_IRQ_0() {
         });
     }
 
-    if mux.is_none() {
-        critical_section::with(|cs| {
-            *mux = GLOBAL_MUX.borrow(cs).take();
-        });
-    }
-
-    if let Some((dma_channels, adc)) = DMA {
-        adc.cs.modify(|_, w| w.en().clear_bit());
-
+    if let Some(dma_channels) = DMA {
         let dma0 = &mut dma_channels.ch0;
-        let dma1 = &mut dma_channels.ch1;
-
-        let next_position = if *POSITION >= 7 { 0 } else { *POSITION + 1 };
-
-        if let Some(mux) = mux {
-            mux.set_output_active(next_position);
-            delay(10);
-
-            let _ = adc.fifo.read().bits();
-            let _ = adc.fifo.read().bits();
-            let _ = adc.fifo.read().bits();
-            let _ = adc.fifo.read().bits();
-
-            adc.cs.modify(|_, w| w.en().set_bit());
-        }
 
         if dma0.check_irq0() {
-            debug!("dma0 irq");
             dma0.ch()
-                .ch_al2_write_addr_trig
-                .write(|w| unsafe { w.bits(&BUF[next_position as usize] as *const _ as u32) });
+                .ch_al1_trans_count_trig
+                .write(|w| unsafe { w.bits(4) });
         }
-
-        if dma1.check_irq0() {
-            debug!("dma1 irq");
-            dma1.ch()
-                .ch_al3_write_addr
-                .write(|w| unsafe { w.bits(&BUF[next_position as usize] as *const _ as u32) });
-        }
-
-        *POSITION = next_position;
-        delay(30000000);
-
-        debug!("position: {:?}, duty: {:?}", *POSITION, BUF);
     }
 }

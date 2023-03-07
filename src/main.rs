@@ -7,21 +7,17 @@ use defmt::*;
 use defmt_rtt as _;
 use panic_probe as _;
 
-use hal::{
-    clocks::{init_clocks_and_plls, Clock},
-    dma::{DMAExt, SingleChannel},
-    entry, pac,
-    watchdog::Watchdog,
-    Adc, Sio,
-};
+use hal::{clocks, entry, pac, watchdog, Adc, Clock, Timer};
 
 mod hall;
-mod multiplexer;
 
-mod adc;
-mod dma;
+mod hardware;
+mod matrix;
 
-use crate::{adc::InitializeADC, dma::InitializeDMA};
+use crate::{
+    hardware::ReadAdc,
+    matrix::{ScanOrder, Switch},
+};
 
 /// The linker will place this boot block at the start of our program image. We
 /// need this to help the ROM bootloader get our code up and running.
@@ -34,14 +30,15 @@ pub const DMA_BUF_SIZE: usize = 4;
 #[entry]
 fn main() -> ! {
     info!("program start");
+
     let mut pac = pac::Peripherals::take().unwrap();
     let core = pac::CorePeripherals::take().unwrap();
-    let mut watchdog = Watchdog::new(pac.WATCHDOG);
-    let sio = Sio::new(pac.SIO);
+    let mut watchdog = watchdog::Watchdog::new(pac.WATCHDOG);
+    let sio = hal::Sio::new(pac.SIO);
 
     // External high-speed crystal on the pico board is 12Mhz
     let external_xtal_freq_hz = 12_000_000u32;
-    let clocks = init_clocks_and_plls(
+    let clocks = clocks::init_clocks_and_plls(
         external_xtal_freq_hz,
         pac.XOSC,
         pac.CLOCKS,
@@ -53,7 +50,8 @@ fn main() -> ! {
     .ok()
     .unwrap();
 
-    let mut delay = cortex_m::delay::Delay::new(core.SYST, clocks.system_clock.freq().to_Hz());
+    #[allow(unused_variables)]
+    let delay = cortex_m::delay::Delay::new(core.SYST, clocks.system_clock.freq().to_Hz());
 
     let pins = Pins::new(
         pac.IO_BANK0,
@@ -65,83 +63,75 @@ fn main() -> ! {
     info!("core initialization finished");
 
     // Initialize MUX
-    let mut mux = multiplexer::CD74HC4067::new(
+    let mut mux = hardware::CD74HC4067::new(
         pins.mux1_s0.into_push_pull_output(),
         pins.mux1_s1.into_push_pull_output(),
         pins.mux1_s2.into_push_pull_output(),
         pins.mux1_s3.into_push_pull_output(),
     );
 
-    // critical_section::with(|cs| {
-    //     dma::GLOBAL_MUX.borrow(cs).replace(Some(mux));
-    // });
-
-    // mux.set_output_active(1);
-
     // Initialize ADC
-    let adc = Adc::new(pac.ADC, &mut pac.RESETS);
-    let _adc_pin_0 = pins.mux1_com.into_floating_input();
-    let _adc_pin_1 = pins.mux2_com.into_floating_input();
-    let _adc_pin_2 = pins.mux3_com.into_floating_input();
-    let _adc_pin_3 = pins.mux4_com.into_floating_input();
-    let mut adc = adc.initialize();
+    let adc = {
+        let adc = Adc::new(pac.ADC, &mut pac.RESETS);
+        let _adc_pin_0 = pins.mux1_com.into_floating_input();
+        let _adc_pin_1 = pins.mux2_com.into_floating_input();
+        let _adc_pin_2 = pins.mux3_com.into_floating_input();
+        let _adc_pin_3 = pins.mux4_com.into_floating_input();
 
-    // Initialize DMA.
-    // let dma = hal::dma::Channels::initialize(
-    //     pac.DMA.split(&mut pac.RESETS),
-    //     adc,
-    // );
+        let adc = adc.free();
+        adc.cs.modify(|_, w| unsafe { w.rrobin().bits(0b01111) });
 
-    if adc.fcs.read().over().bit_is_set() {
-        error!("fifo overflow");
-        adc.fcs.modify(|_, w| w.over().set_bit())
-    }
-    if adc.fcs.read().under().bit_is_set() {
-        error!("fifo underflow");
-        adc.fcs.modify(|_, w| w.under().set_bit())
-    }
+        adc.cs.modify(|_, w| unsafe { w.ainsel().bits(0) });
+        adc.cs.modify(|_, w| w.en().set_bit());
+        while !adc.cs.read().ready().bit_is_set() {
+            cortex_m::asm::nop();
+        }
+
+        info!("adc initialization finished");
+
+        adc
+    };
+
+    let switches = [
+        Switch::new(0, 0),
+        Switch::new(0, 1),
+        Switch::new(0, 2),
+        Switch::new(0, 3),
+        Switch::new(0, 4),
+        Switch::new(0, 5),
+        Switch::new(0, 6),
+        Switch::new(0, 7),
+    ];
+
+    let mut scan_order = ScanOrder::new(switches);
+
+    #[cfg(feature = "timers")]
+    let timer = Timer::new(pac.TIMER, &mut pac.RESETS);
 
     debug!("starting main loop");
-
-    delay.delay_ms(1);
     loop {
-        mux.set_output_active(0);
-        adc.cs.modify(|_, w| w.start_many().set_bit());
-        while adc.fcs.read().level().bits() < 3 {
-            cortex_m::asm::nop();
+        #[cfg(feature = "timers")]
+        let time = timer.get_counter();
+
+        scan_order
+            .scans
+            .iter_mut()
+            .enumerate()
+            .for_each(|(i, scan)| {
+                mux.set_output_active(i as u8);
+                let r = adc.read_all();
+
+                scan.switches[0].value(r.0);
+                scan.switches[1].value(r.1);
+                scan.switches[2].value(r.2);
+                scan.switches[3].value(r.3);
+            });
+
+        #[cfg(feature = "timers")]
+        {
+            let time2 = timer.get_counter();
+            debug!("time: {:?}", (time2 - time).to_nanos())
         }
-        adc.cs.modify(|_, w| w.start_many().clear_bit());
-
-        while adc.cs.read().ready().bit_is_clear() {
-            cortex_m::asm::nop();
-        }
-
-        let r1 = adc.fifo.read().val().bits();
-        let r2 = adc.fifo.read().val().bits();
-        let r3 = adc.fifo.read().val().bits();
-        let r4 = adc.fifo.read().val().bits();
-        debug!("duty: {:?} {:?} {:?} {:?}", r1, r2, r3, r4,);
-
-        debug!("mux input 1");
-        mux.set_output_active(7);
-        adc.cs.modify(|_, w| w.start_many().set_bit());
-        while adc.fcs.read().level().bits() < 3 {
-            cortex_m::asm::nop();
-        }
-        adc.cs.modify(|_, w| w.start_many().clear_bit());
-
-        while adc.cs.read().ready().bit_is_clear() {
-            cortex_m::asm::nop();
-        }
-
-        let r6 = adc.fifo.read().val().bits() as u8;
-        let r7 = adc.fifo.read().val().bits() as u8;
-        let r8 = adc.fifo.read().val().bits() as u8;
-        let r9 = adc.fifo.read().val().bits() as u8;
-        debug!("duty: {:?} {:?} {:?} {:?}", r6, r7, r8, r9);
-
-
-        delay.delay_ms(1);
     }
 }
 
