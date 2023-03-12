@@ -9,6 +9,9 @@ A2 would use ~50%
 A1 would use 100%, but might clip.
 ** DONE switch to drv5056A2
 ** TODO Use same pins for all mux selects
+** TODO matrix to keycode conversion
+** TODO usb hid impl
+https://github.com/dlkj/usbd-human-interface-device
 
 * Magnet distance lookup table
 3.25V VCC

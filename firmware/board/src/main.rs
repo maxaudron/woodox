@@ -1,23 +1,22 @@
 #![no_std]
 #![no_main]
 
+use hal::multicore::Multicore;
+use hal::multicore::Stack;
 use rp2040_hal as hal;
+use usb_device::class_prelude::*;
 
 use defmt::*;
 use defmt_rtt as _;
 use panic_probe as _;
 
-use hal::{clocks, entry, pac, watchdog, Adc, Clock, Timer};
-
-mod hall;
+use hal::{clocks, entry, pac, watchdog, Adc, Clock};
 
 mod hardware;
-mod matrix;
+mod scan;
+mod usb;
 
-use crate::{
-    hardware::ReadAdc,
-    matrix::{ScanOrder, Switch},
-};
+use woodox_lib::layout;
 
 /// The linker will place this boot block at the start of our program image. We
 /// need this to help the ROM bootloader get our code up and running.
@@ -27,14 +26,18 @@ pub static BOOT2: [u8; 256] = rp2040_boot2::BOOT_LOADER_GENERIC_03H;
 
 pub const DMA_BUF_SIZE: usize = 4;
 
+static mut CORE1_STACK: Stack<4096> = Stack::new();
+
 #[entry]
 fn main() -> ! {
     info!("program start");
 
+    // ------------------------------------
+    // Setup core hardware
     let mut pac = pac::Peripherals::take().unwrap();
     let core = pac::CorePeripherals::take().unwrap();
     let mut watchdog = watchdog::Watchdog::new(pac.WATCHDOG);
-    let sio = hal::Sio::new(pac.SIO);
+    let mut sio = hal::Sio::new(pac.SIO);
 
     // External high-speed crystal on the pico board is 12Mhz
     let external_xtal_freq_hz = 12_000_000u32;
@@ -52,6 +55,7 @@ fn main() -> ! {
 
     #[allow(unused_variables)]
     let delay = cortex_m::delay::Delay::new(core.SYST, clocks.system_clock.freq().to_Hz());
+    let timer = hal::Timer::new(pac.TIMER, &mut pac.RESETS);
 
     let pins = Pins::new(
         pac.IO_BANK0,
@@ -62,8 +66,11 @@ fn main() -> ! {
 
     info!("core initialization finished");
 
+    // ------------------------------------
+    // Setup Mux and ADC for switch scanning
+
     // Initialize MUX
-    let mut mux = hardware::CD74HC4067::new(
+    let mux = hardware::CD74HC4067::new(
         pins.mux1_s0.into_push_pull_output(),
         pins.mux1_s1.into_push_pull_output(),
         pins.mux1_s2.into_push_pull_output(),
@@ -92,47 +99,26 @@ fn main() -> ! {
         adc
     };
 
-    let switches = [
-        Switch::new(0, 0),
-        Switch::new(0, 1),
-        Switch::new(0, 2),
-        Switch::new(0, 3),
-        Switch::new(0, 4),
-        Switch::new(0, 5),
-        Switch::new(0, 6),
-        Switch::new(0, 7),
-    ];
+    // ------------------------------------
+    // Setup USB BUS
+    let usb_bus = UsbBusAllocator::new(hal::usb::UsbBus::new(
+        pac.USBCTRL_REGS,
+        pac.USBCTRL_DPRAM,
+        clocks.usb_clock,
+        true,
+        &mut pac.RESETS,
+    ));
 
-    let mut scan_order = ScanOrder::new(switches);
+    // ------------------------------------
+    // Start switch scan loop on core 1
+    let mut mc = Multicore::new(&mut pac.PSM, &mut pac.PPB, &mut sio.fifo);
+    let cores = mc.cores();
+    let core1 = &mut cores[1];
+    let _scan = core1.spawn(unsafe { &mut CORE1_STACK.mem }, || scan::scan(adc, mux));
 
-    #[cfg(feature = "timers")]
-    let timer = Timer::new(pac.TIMER, &mut pac.RESETS);
-
-    debug!("starting main loop");
-    loop {
-        #[cfg(feature = "timers")]
-        let time = timer.get_counter();
-
-        scan_order
-            .scans
-            .iter_mut()
-            .enumerate()
-            .for_each(|(i, scan)| {
-                mux.set_output_active(i as u8);
-                let r = adc.read_all();
-
-                scan.switches[0].value(r.0);
-                scan.switches[1].value(r.1);
-                scan.switches[2].value(r.2);
-                scan.switches[3].value(r.3);
-            });
-
-        #[cfg(feature = "timers")]
-        {
-            let time2 = timer.get_counter();
-            debug!("time: {:?}", (time2 - time).to_nanos())
-        }
-    }
+    // ------------------------------------
+    // Start usb controlelr loop on core 0
+    usb::usb::<hal::usb::UsbBus>(timer, usb_bus)
 }
 
 hal::bsp_pins!(

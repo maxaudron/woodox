@@ -3,7 +3,8 @@
 *.log
 tmp/
 
-/target
+/firmware/target
+/firmware/board/target
 /result
 /.direnv
 

@@ -1,8 +1,9 @@
+use crate::layout::*;
 use rp2040_hal::pac::ADC;
 
 pub trait ReadAdc {
     fn read(&self, pin: u8) -> u8;
-    fn read_all(&self) -> (u8, u8, u8, u8);
+    fn read_all(&self) -> [u8; NUM_MUX];
 }
 
 impl ReadAdc for ADC {
@@ -17,7 +18,13 @@ impl ReadAdc for ADC {
         (self.result.read().result().bits() >> 4) as u8
     }
 
-    fn read_all(&self) -> (u8, u8, u8, u8) {
-        (self.read(0), self.read(1), self.read(2), self.read(3))
+    fn read_all(&self) -> [u8; NUM_MUX] {
+        let mut r = [0; NUM_MUX];
+
+        r.iter_mut()
+            .enumerate()
+            .for_each(|(i, r)| *r = self.read(i as u8));
+
+        r
     }
 }
