@@ -65,27 +65,34 @@ impl Keymap {
     /// Update the key with the position `key` with a new `state`
     pub fn set_key(key: usize, state: bool) {
         unsafe {
-            match KEYMAP.layers[KEYMAP.active_layer][key] {
-                Key::Keycode(action) => {
-                    if state {
-                        KEYBOARD[action as usize] = action;
-                        debug!("key pressed: {:?}", action as u8)
-                    } else {
-                        KEYBOARD[action as usize] = Keyboard::NoEventIndicated;
-                        debug!("key released: {:?}", action as u8)
+            for check_layer in (0..(KEYMAP.active_layer + 1)).rev() {
+                debug!("layer: {:?}", check_layer);
+                match KEYMAP.layers[(check_layer) as usize][key] {
+                    Key::Keycode(action) => {
+                        if state {
+                            KEYBOARD[action as usize] = action;
+                            debug!("key pressed: {:?}", action as u8)
+                        } else {
+                            KEYBOARD[action as usize] = Keyboard::NoEventIndicated;
+                            debug!("key released: {:?}", action as u8)
+                        }
+
+                        return;
                     }
-                }
-                Key::Layer(layer) => {
-                    if state {
-                        KEYMAP.active_layer = layer;
-                        debug!("layer activated: {:?}", layer)
-                    } else {
-                        KEYMAP.active_layer = 0;
-                        debug!("layer deactivated: {:?}", layer)
+                    Key::Layer(layer) => {
+                        if state {
+                            KEYMAP.active_layer = layer;
+                            debug!("layer activated: {:?}", layer)
+                        } else {
+                            KEYMAP.active_layer = 0;
+                            debug!("layer deactivated: {:?}", layer)
+                        }
+
+                        return;
                     }
+                    Key::Trns => continue,
+                    Key::Dead => return,
                 }
-                Key::Trns => {}
-                Key::Dead => todo!(),
             }
         }
     }
