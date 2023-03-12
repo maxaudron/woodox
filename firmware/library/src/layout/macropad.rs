@@ -26,7 +26,7 @@ keymap! {
         Layer(1), Key(F), Key(G), Key(H),
     ];
     1 = layer! [
-          Key(Z), Key(Z), Key(Z), Key(Z),
-        Layer(1), Key(Z), Key(Z), Key(Z),
+        Key(Z), Key(Z), Key(Z), Key(Z),
+          Trns, Key(Z), Key(Z), Key(Z),
     ];
 }

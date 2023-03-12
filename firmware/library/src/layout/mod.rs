@@ -26,8 +26,8 @@ macro_rules! keymap {
 }
 
 macro_rules! layer {
-    [$($k:tt($key:tt)),+$(,)+] => {
-        [ $( key!($k($key)) ),+ ]
+    [$($k:tt$(($key:tt))*),+$(,)+] => {
+        [ $( key!($k$(($key))*) ),+ ]
     };
 }
 
@@ -37,7 +37,10 @@ macro_rules! key {
     };
     ($k:tt($key:tt)) => {
         Key::$k($key)
-    }
+    };
+    ($k:tt) => {
+        Key::$k
+    };
 }
 
 pub(crate) use {keymap, layer, switches};
