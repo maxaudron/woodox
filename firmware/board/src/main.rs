@@ -10,7 +10,7 @@ use defmt::*;
 use defmt_rtt as _;
 use panic_probe as _;
 
-use hal::{clocks, entry, pac, watchdog, Adc, Clock};
+use hal::{clocks, entry, pac, watchdog, Adc};
 
 mod hardware;
 mod scan;
@@ -35,7 +35,7 @@ fn main() -> ! {
     // ------------------------------------
     // Setup core hardware
     let mut pac = pac::Peripherals::take().unwrap();
-    let core = pac::CorePeripherals::take().unwrap();
+    let _core = pac::CorePeripherals::take().unwrap();
     let mut watchdog = watchdog::Watchdog::new(pac.WATCHDOG);
     let mut sio = hal::Sio::new(pac.SIO);
 

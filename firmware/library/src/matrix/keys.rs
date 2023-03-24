@@ -14,14 +14,14 @@
 use defmt::debug;
 use usbd_human_interface_device::page::Keyboard;
 
-use crate::layout::{default_keymap, HOLD_TIME, NUM_SWITCHES};
+use crate::layout::{default_keymap, NUM_SWITCHES};
 
 /// A single key position in a layer
 #[derive(Debug, Copy, Clone)]
 pub enum Key {
     Keycode(Keyboard),
     Layer(usize),
-    LayerTap(usize, Keyboard, usize),
+    LayerTap(usize, Keyboard),
     GrvEsc,
     Trns,
     Dead,
@@ -76,15 +76,10 @@ impl Keymap {
         }
     }
 
-    pub fn set_oneshot_keycode(state: bool, keycode: Keyboard) {
+    pub fn set_oneshot_keycode(keycode: Keyboard) {
         unsafe {
-            if state {
-                KEYBOARD[keycode as usize + 231] = keycode;
-                debug!("oneshot key pressed: {:#X}", keycode as u8)
-            } else {
-                KEYBOARD[keycode as usize + 231] = Keyboard::NoEventIndicated;
-                debug!("oneshot key released: {:#X}", keycode as u8)
-            }
+            KEYBOARD[keycode as usize + 231] = keycode;
+            debug!("oneshot key pressed: {:#X}", keycode as u8)
         }
     }
 
@@ -101,7 +96,7 @@ impl Keymap {
     }
 
     /// Update the key with the position `key` with a new `state`
-    pub fn set_key(key: usize, state: bool) {
+    pub fn set_key(key: usize, state: bool, held: bool) {
         unsafe {
             for check_layer in (0..(KEYMAP.active_layer + 1)).rev() {
                 debug!("layer: {:?}", check_layer);
@@ -114,14 +109,12 @@ impl Keymap {
                         Keymap::set_layer(state, *layer);
                         return;
                     }
-                    Key::LayerTap(layer, keycode, time) => {
-                        if *time >= HOLD_TIME {
-                            Keymap::set_layer(state, *layer);
-                        } else if !state {
-                            Keymap::set_oneshot_keycode(state, *keycode)
+                    Key::LayerTap(_, keycode) => {
+                        if !state && !held {
+                            Keymap::set_oneshot_keycode(*keycode);
                         }
 
-                        *time += 1;
+                        return;
                     }
                     Key::GrvEsc => {
                         if KEYBOARD[Keyboard::LeftShift as usize] == Keyboard::LeftShift
@@ -136,6 +129,18 @@ impl Keymap {
                     }
                     Key::Trns => continue,
                     Key::Dead => return,
+                }
+            }
+        }
+    }
+
+    pub fn set_hold(key: usize, state: bool) {
+        debug!("hold: {:?} {:?}", key, state);
+        unsafe {
+            for check_layer in (0..(KEYMAP.active_layer + 1)).rev() {
+                match &mut KEYMAP.layers[(check_layer)][key] {
+                    Key::LayerTap(layer, _) => Keymap::set_layer(state, *layer),
+                    _ => continue,
                 }
             }
         }

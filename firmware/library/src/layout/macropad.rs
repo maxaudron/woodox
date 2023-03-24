@@ -15,7 +15,8 @@ pub const NUM_SWITCHES: usize = 8;
 /// compile time if it is unset.
 pub const NUM_SCANS: usize = NUM_SWITCHES / NUM_MUX;
 
-pub const HOLD_TIME: usize = 100;
+/// About 200ms for this board
+pub const HOLD_TIME: u32 = 8000;
 
 switches! {
     0,1, 0,3, 0,5, 0,7,
@@ -25,7 +26,7 @@ switches! {
 keymap! {
     0 = layer! [
           Key(A), Key(B), Key(C), GrvEsc,
-        Layer(1), Key(F), Key(G), Key(LeftShift),
+        LayerTap(1, L), Key(F), Key(G), Key(LeftShift),
     ];
     1 = layer! [
         Key(Z), Key(Z), Key(Z), GrvEsc,

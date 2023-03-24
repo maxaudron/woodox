@@ -1,5 +1,7 @@
 use defmt::Format;
 
+use crate::layout::HOLD_TIME;
+
 use super::keys::Keymap;
 
 #[derive(Debug, Format, Copy, Clone)]
@@ -24,6 +26,9 @@ pub struct Switch {
     /// Index of the switch used to map it
     /// to a location in the keymaps
     pub index: usize,
+
+    pub hold_counter: u32,
+    pub held: bool,
 }
 
 impl Default for Switch {
@@ -33,10 +38,13 @@ impl Default for Switch {
             comp: 26,
             mux: 0,
             channel: 0,
-            pressed: false,
             trig_lower: 20,
             trig_upper: 22,
             index: 0,
+
+            pressed: false,
+            hold_counter: 0,
+            held: false,
         }
     }
 }
@@ -66,11 +74,26 @@ impl Switch {
         if self.pressed {
             if self.position >= self.trig_upper {
                 self.pressed = false;
-                Keymap::set_key(self.index, false)
+                Keymap::set_key(self.index, false, self.held);
+
+                if self.held {
+                    self.held = false;
+                    Keymap::set_hold(self.index, false);
+                }
+
+            } else {
+                if !self.held && self.hold_counter >= HOLD_TIME {
+                    self.held = true;
+                    self.hold_counter = 0;
+                    Keymap::set_hold(self.index, true);
+                } else {
+                    self.hold_counter += 1;
+                }
             }
         } else if self.position <= self.trig_lower {
             self.pressed = true;
-            Keymap::set_key(self.index, true);
+
+            Keymap::set_key(self.index, true, false);
         }
     }
 }

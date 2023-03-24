@@ -26,14 +26,23 @@ macro_rules! keymap {
 }
 
 macro_rules! layer {
-    [$($k:tt$(($key:tt))*),+$(,)+] => {
-        [ $( key!($k$(($key))*) ),+ ]
+    [$(
+        $k:tt
+            $((
+                $key:tt$(, $code:tt)*
+            ))*
+    ),+$(,)+
+    ] => {
+        [ $( key!($k$(($key$(, $code)*))*) ),+ ]
     };
 }
 
 macro_rules! key {
     (Key($key:tt)) => {
         Key::Keycode(Keyboard::$key)
+    };
+    ($k:tt($layer:literal, $key:tt)) => {
+        Key::$k($layer, Keyboard::$key)
     };
     ($k:tt($key:tt)) => {
         Key::$k($key)
