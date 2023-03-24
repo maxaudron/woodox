@@ -16,14 +16,30 @@ use usbd_human_interface_device::page::Keyboard;
 
 use crate::layout::{default_keymap, NUM_SWITCHES};
 
-/// A single key position in a layer
+/// A single key position in a [`Layer`]
 #[derive(Debug, Copy, Clone)]
 pub enum Key {
+    /// Emit a regular USB HID Keycode like letters or numbers
+    ///
+    /// See [`usbd_human_interface_device::page::Keyboard`] for full reference
     Keycode(Keyboard),
+    /// Use [`Layer`] `n` while held.
+    ///
+    /// This position should be a [`Key::Trns`] key on [`Layer`] `n`
     Layer(usize),
+    /// [`Layer`] `n` while held, [`keycode`] when tapped.
+    ///
+    /// [`keycode`]: usbd_human_interface_device::page::Keyboard
     LayerTap(usize, Keyboard),
+    /// [`keycode`] `x` while held, [`keycode`] `y` when tapped.
+    ///
+    /// [`keycode`]: usbd_human_interface_device::page::Keyboard
+    KeyTap(Keyboard, Keyboard),
+    /// Escape regularly, Grave (`) while shift is pressed
     GrvEsc,
+    /// Transparent: Pass this key to the [`Layer`] below
     Trns,
+    /// No key action
     Dead,
 }
 
@@ -47,6 +63,7 @@ pub const NUM_KEYCODES: usize = 231 * 2;
 ///
 static mut KEYMAP: Keymap = default_keymap();
 
+/// A map of logical key actions to physical key positions
 pub type Layer = [Key; NUM_SWITCHES];
 pub const NUM_LAYERS: usize = 32;
 
@@ -64,6 +81,7 @@ impl Keymap {
         }
     }
 
+    /// Set keycode or clear keycode
     pub fn set_keycode(state: bool, keycode: Keyboard) {
         unsafe {
             if state {
@@ -76,6 +94,7 @@ impl Keymap {
         }
     }
 
+    /// Activate a keycode to be active exactly once in the next USB HID Report.
     pub fn set_oneshot_keycode(keycode: Keyboard) {
         unsafe {
             KEYBOARD[keycode as usize + 231] = keycode;
@@ -83,6 +102,7 @@ impl Keymap {
         }
     }
 
+    /// Set `layer` active or inactive based on `state`
     pub fn set_layer(state: bool, layer: usize) {
         unsafe {
             if state {
@@ -95,7 +115,9 @@ impl Keymap {
         }
     }
 
-    /// Update the key with the position `key` with a new `state`
+    /// Update the key with the position `key` with a new `state`.
+    ///
+    /// `held` is set to true if a switch is held for more than [`crate::layout::HOLD_TIME`]
     pub fn set_key(key: usize, state: bool, held: bool) {
         unsafe {
             for check_layer in (0..(KEYMAP.active_layer + 1)).rev() {
@@ -110,6 +132,13 @@ impl Keymap {
                         return;
                     }
                     Key::LayerTap(_, keycode) => {
+                        if !state && !held {
+                            Keymap::set_oneshot_keycode(*keycode);
+                        }
+
+                        return;
+                    }
+                    Key::KeyTap(_, keycode) => {
                         if !state && !held {
                             Keymap::set_oneshot_keycode(*keycode);
                         }
@@ -134,12 +163,18 @@ impl Keymap {
         }
     }
 
+    /// Key actions if they are held.
+    ///
+    /// [`Keymap::set_key()`] is also run on held keys, so only keys that
+    /// have different handling when held rather than tapped are required
+    /// to be set here
     pub fn set_hold(key: usize, state: bool) {
         debug!("hold: {:?} {:?}", key, state);
         unsafe {
             for check_layer in (0..(KEYMAP.active_layer + 1)).rev() {
                 match &mut KEYMAP.layers[(check_layer)][key] {
                     Key::LayerTap(layer, _) => Keymap::set_layer(state, *layer),
+                    Key::KeyTap(keycode, _) => Keymap::set_keycode(state, *keycode),
                     _ => continue,
                 }
             }
@@ -151,6 +186,7 @@ impl Keymap {
         unsafe { KEYBOARD }
     }
 
+    /// Clear all oneshot keys. Run after every USB HID Report.
     pub fn clear_oneshot() {
         unsafe {
             for key in KEYBOARD.iter_mut().take(NUM_KEYCODES).skip(231) {
@@ -181,9 +217,9 @@ mod tests {
             unsafe {
                 $($(set_key!(Keyboard::$mod);),*)?
                 KEYMAP.layers[0][0] = $map;
-                Keymap::set_key(0, true);
+                Keymap::set_key(0, true, false);
                 assert!(KEYBOARD[Keyboard::$key as usize] == Keyboard::$key);
-                Keymap::set_key(0, false);
+                Keymap::set_key(0, false, false);
                 KEYMAP.layers[0][0] = Key::Dead;
                 $($(clear_key!(Keyboard::$mod);),*)?
             }

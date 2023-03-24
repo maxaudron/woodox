@@ -1,5 +1,6 @@
 //! Module containing different layouts and exposing them generically
 
+#[macro_export]
 macro_rules! switches {
     {$($x:expr,$y:expr),+$(,)+} => {
         use crate::matrix::Switch;
@@ -10,6 +11,7 @@ macro_rules! switches {
     };
 }
 
+#[macro_export]
 macro_rules! keymap {
     {$($n:literal=$layer:expr;)+} => {
         use usbd_human_interface_device::page::Keyboard;
@@ -25,6 +27,7 @@ macro_rules! keymap {
     };
 }
 
+#[macro_export]
 macro_rules! layer {
     [$(
         $k:tt
@@ -37,6 +40,7 @@ macro_rules! layer {
     };
 }
 
+#[macro_export]
 macro_rules! key {
     (Key($key:tt)) => {
         Key::Keycode(Keyboard::$key)
@@ -52,7 +56,7 @@ macro_rules! key {
     };
 }
 
-pub(crate) use {keymap, layer, switches};
+pub use {keymap, layer, switches};
 
 #[cfg(feature = "macropad")]
 mod macropad;

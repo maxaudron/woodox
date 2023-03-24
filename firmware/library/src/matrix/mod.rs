@@ -1,3 +1,5 @@
+#![doc = include_str!("readme.md")]
+
 use defmt::Format;
 
 use crate::layout::*;
@@ -8,8 +10,12 @@ mod switch;
 
 pub use keys::*;
 pub use switch::*;
+pub use hall::*;
 
 /// A Single scan action to be taken on multiple switches
+///
+/// The rp2040 ADC for example has an internal 4 pin mux that allows it
+/// to read multiple values from the ADC in quick succession.
 #[derive(Default, Debug, Format, Copy, Clone)]
 pub struct Scan {
     pub switches: [Switch; NUM_MUX],
@@ -27,13 +33,17 @@ impl Scan {
 /// The order we will execute all the scans in
 ///
 /// Technically the order does not matter, but we want to keep it
-/// consistent during one run at least.
+/// consistent so we can map the index of the scan and switch to
+/// an exact position in our [`Layer`]
+///
+/// [`Layer`]: crate::matrix::Layer
 #[derive(Default, Debug, Format, Copy, Clone)]
 pub struct ScanOrder {
     pub scans: [Scan; NUM_SCANS],
 }
 
 impl ScanOrder {
+    /// Order the user representation of the keyboard layout for runtime.
     pub fn new(switches: [Switch; NUM_SWITCHES]) -> Self {
         let mut scans = [Scan::default(); NUM_SCANS];
 

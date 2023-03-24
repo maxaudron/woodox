@@ -1,4 +1,6 @@
-pub fn distance_u8(v: u8) -> u8 {
+/// Convert the raw hall sensor value to a distance in milimeters.
+/// 1 unit is 0.1mm.
+pub fn distance(v: u8) -> u8 {
     match v {
         248..=255 => 26,
         236..=247 => 27,
@@ -45,7 +47,7 @@ pub fn distance_u8(v: u8) -> u8 {
     }
 }
 
-pub fn _distance(v: u16) -> u8 {
+fn _distance(v: u16) -> u8 {
     match v {
         15817..=16805 => 2,
         14844..=15816 => 3,

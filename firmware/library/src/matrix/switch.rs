@@ -4,6 +4,7 @@ use crate::layout::HOLD_TIME;
 
 use super::keys::Keymap;
 
+/// A single switch in our keyboard
 #[derive(Debug, Format, Copy, Clone)]
 pub struct Switch {
     /// Switch position in units of 0.1mm
@@ -64,7 +65,7 @@ impl Switch {
 
     /// Set the position of the switch based on raw ADC value
     pub fn value(&mut self, value: u8) {
-        self.position = super::hall::distance_u8(value) - self.comp
+        self.position = super::hall::distance(value) - self.comp
     }
 
     /// Update the state of the switch and asociated key with the raw ADC value
