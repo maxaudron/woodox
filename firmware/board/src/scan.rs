@@ -1,11 +1,11 @@
 use core::fmt::Debug;
-use defmt::info;
+use defmt::{debug, info};
 
 use embedded_hal::digital::v2::OutputPin;
 use woodox_lib::{layout::default_switches, matrix::ScanOrder};
 
 use crate::{
-    hal::pac::ADC,
+    hal::pac::{ADC, TIMER},
     hardware::{self, ReadAdc},
 };
 
@@ -22,8 +22,12 @@ where
 {
     let mut scan_order = ScanOrder::new(default_switches());
 
+    let timer = TIMER::ptr();
+
     info!("starting scan loop");
     loop {
+        let time1 = unsafe { get_counter(&(*timer)) };
+
         scan_order
             .scans
             .iter_mut()
@@ -33,5 +37,22 @@ where
                 let r = adc.read_all();
                 scan.update(r)
             });
+
+        let time2 = unsafe { get_counter(&(*timer)) };
+        debug!("scan time: {}µs", (time2 - time1));
     }
+}
+
+fn get_counter(timer: &crate::pac::timer::RegisterBlock) -> u64 {
+    let mut hi0 = timer.timerawh.read().bits();
+    let timestamp = loop {
+        let low = timer.timerawl.read().bits();
+        let hi1 = timer.timerawh.read().bits();
+        if hi0 == hi1 {
+            break (u64::from(hi0) << 32) | u64::from(low);
+        }
+        hi0 = hi1;
+    };
+
+    timestamp
 }

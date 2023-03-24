@@ -54,7 +54,6 @@ fn main() -> ! {
     .unwrap();
 
     #[allow(unused_variables)]
-    let delay = cortex_m::delay::Delay::new(core.SYST, clocks.system_clock.freq().to_Hz());
     let timer = hal::Timer::new(pac.TIMER, &mut pac.RESETS);
 
     let pins = Pins::new(

@@ -16,7 +16,6 @@ overflow-checks = true
 
 # cargo build/run --release
 [profile.release]
-strip = "symbols"
 codegen-units = 1
 debug = 0
 debug-assertions = false

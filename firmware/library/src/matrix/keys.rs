@@ -14,13 +14,15 @@
 use defmt::debug;
 use usbd_human_interface_device::page::Keyboard;
 
-use crate::layout::{default_keymap, NUM_SWITCHES};
+use crate::layout::{default_keymap, HOLD_TIME, NUM_SWITCHES};
 
 /// A single key position in a layer
 #[derive(Debug, Copy, Clone)]
 pub enum Key {
     Keycode(Keyboard),
     Layer(usize),
+    LayerTap(usize, Keyboard, usize),
+    GrvEsc,
     Trns,
     Dead,
 }
@@ -39,7 +41,7 @@ impl Key {
 ///
 /// [`Keyboard`]: usbd_human_interface_device::page::Keyboard
 static mut KEYBOARD: [Keyboard; NUM_KEYCODES] = [Keyboard::NoEventIndicated; NUM_KEYCODES];
-pub const NUM_KEYCODES: usize = 231;
+pub const NUM_KEYCODES: usize = 231 * 2;
 
 /// Mapping of switch locations to keys.
 ///
@@ -62,30 +64,72 @@ impl Keymap {
         }
     }
 
+    pub fn set_keycode(state: bool, keycode: Keyboard) {
+        unsafe {
+            if state {
+                KEYBOARD[keycode as usize] = keycode;
+                debug!("key pressed: {:#X}", keycode as u8)
+            } else {
+                KEYBOARD[keycode as usize] = Keyboard::NoEventIndicated;
+                debug!("key released: {:#X}", keycode as u8)
+            }
+        }
+    }
+
+    pub fn set_oneshot_keycode(state: bool, keycode: Keyboard) {
+        unsafe {
+            if state {
+                KEYBOARD[keycode as usize + 231] = keycode;
+                debug!("oneshot key pressed: {:#X}", keycode as u8)
+            } else {
+                KEYBOARD[keycode as usize + 231] = Keyboard::NoEventIndicated;
+                debug!("oneshot key released: {:#X}", keycode as u8)
+            }
+        }
+    }
+
+    pub fn set_layer(state: bool, layer: usize) {
+        unsafe {
+            if state {
+                KEYMAP.active_layer = layer;
+                debug!("layer activated: {:?}", layer)
+            } else {
+                KEYMAP.active_layer = 0;
+                debug!("layer deactivated: {:?}", layer)
+            }
+        }
+    }
+
     /// Update the key with the position `key` with a new `state`
     pub fn set_key(key: usize, state: bool) {
         unsafe {
             for check_layer in (0..(KEYMAP.active_layer + 1)).rev() {
                 debug!("layer: {:?}", check_layer);
-                match KEYMAP.layers[(check_layer) as usize][key] {
-                    Key::Keycode(action) => {
-                        if state {
-                            KEYBOARD[action as usize] = action;
-                            debug!("key pressed: {:?}", action as u8)
-                        } else {
-                            KEYBOARD[action as usize] = Keyboard::NoEventIndicated;
-                            debug!("key released: {:?}", action as u8)
-                        }
-
+                match &mut KEYMAP.layers[(check_layer)][key] {
+                    Key::Keycode(keycode) => {
+                        Keymap::set_keycode(state, *keycode);
                         return;
                     }
                     Key::Layer(layer) => {
-                        if state {
-                            KEYMAP.active_layer = layer;
-                            debug!("layer activated: {:?}", layer)
+                        Keymap::set_layer(state, *layer);
+                        return;
+                    }
+                    Key::LayerTap(layer, keycode, time) => {
+                        if *time >= HOLD_TIME {
+                            Keymap::set_layer(state, *layer);
+                        } else if !state {
+                            Keymap::set_oneshot_keycode(state, *keycode)
+                        }
+
+                        *time += 1;
+                    }
+                    Key::GrvEsc => {
+                        if KEYBOARD[Keyboard::LeftShift as usize] == Keyboard::LeftShift
+                            || KEYBOARD[Keyboard::RightShift as usize] == Keyboard::RightShift
+                        {
+                            Keymap::set_keycode(state, Keyboard::Grave);
                         } else {
-                            KEYMAP.active_layer = 0;
-                            debug!("layer deactivated: {:?}", layer)
+                            Keymap::set_keycode(state, Keyboard::Escape);
                         }
 
                         return;
@@ -100,5 +144,51 @@ impl Keymap {
     /// Get the state of the whole keyboard to pass as report over USB
     pub fn keyboard() -> [Keyboard; NUM_KEYCODES] {
         unsafe { KEYBOARD }
+    }
+
+    pub fn clear_oneshot() {
+        unsafe {
+            for key in KEYBOARD.iter_mut().take(NUM_KEYCODES).skip(231) {
+                *key = Keyboard::NoEventIndicated;
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    macro_rules! set_key {
+        ($key:path) => {
+            KEYBOARD[$key as usize] = $key;
+        };
+    }
+
+    macro_rules! clear_key {
+        ($key:path) => {
+            KEYBOARD[$key as usize] = Keyboard::NoEventIndicated;
+        };
+    }
+
+    macro_rules! assert_key {
+        ( $map:path, $key:ident $(, $(mod $mod:ident),*)?) => {
+            unsafe {
+                $($(set_key!(Keyboard::$mod);),*)?
+                KEYMAP.layers[0][0] = $map;
+                Keymap::set_key(0, true);
+                assert!(KEYBOARD[Keyboard::$key as usize] == Keyboard::$key);
+                Keymap::set_key(0, false);
+                KEYMAP.layers[0][0] = Key::Dead;
+                $($(clear_key!(Keyboard::$mod);),*)?
+            }
+        };
+    }
+
+    #[test]
+    fn key_grave_escape() {
+        assert_key!(Key::GrvEsc, Escape);
+        assert_key!(Key::GrvEsc, Grave, mod LeftShift);
+        assert_key!(Key::GrvEsc, Grave, mod RightShift);
     }
 }

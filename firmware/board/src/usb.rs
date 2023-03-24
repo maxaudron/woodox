@@ -51,6 +51,8 @@ where
                     core::panic!("Failed to process keyboard tick: {:?}", e)
                 }
             };
+
+            matrix::Keymap::clear_oneshot();
         }
 
         if usb_dev.poll(&mut [&mut keyboard]) {

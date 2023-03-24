@@ -15,6 +15,8 @@ pub const NUM_SWITCHES: usize = 8;
 /// compile time if it is unset.
 pub const NUM_SCANS: usize = NUM_SWITCHES / NUM_MUX;
 
+pub const HOLD_TIME: usize = 100;
+
 switches! {
     0,1, 0,3, 0,5, 0,7,
     0,0, 0,2, 0,4, 0,6,
@@ -22,11 +24,11 @@ switches! {
 
 keymap! {
     0 = layer! [
-          Key(A), Key(B), Key(C), Key(D),
-        Layer(1), Key(F), Key(G), Key(H),
+          Key(A), Key(B), Key(C), GrvEsc,
+        Layer(1), Key(F), Key(G), Key(LeftShift),
     ];
     1 = layer! [
-        Key(Z), Key(Z), Key(Z), Key(Z),
-          Trns, Key(Z), Key(Z), Key(Z),
+        Key(Z), Key(Z), Key(Z), GrvEsc,
+          Trns, Key(Z), Key(Z), Key(LeftShift),
     ];
 }

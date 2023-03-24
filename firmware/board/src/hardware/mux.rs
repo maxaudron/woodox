@@ -61,6 +61,7 @@ where
         }
 
         // Wait one cpu cycle (8ns) for mux to settle
+        // FIXME TODO try without this
         cortex_m::asm::delay(1);
     }
 }
