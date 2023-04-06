@@ -17,13 +17,24 @@ pub struct Switch {
     /// Boundry that triggers a release
     pub trig_upper: u8,
 
+    /// If repid trigger is enabled for this switch,
+    pub rapid_enabled: bool,
+    /// If the switch is currently pressed
+    pub rapid_pressed: bool,
+    /// Last position that triggered a press or release
+    pub rapid_position: u8,
+    /// Boundry that triggers a press
+    pub rapid_lower: u8,
+    /// Boundry that triggers a release
+    pub rapid_upper: u8,
+
     /// individual position correction
     pub comp: u8,
+
     /// ID of the mux this switch is attached to
     pub mux: u8,
     /// Channel of the mux this switch is attached to
     pub channel: u8,
-
     /// Index of the switch used to map it
     /// to a location in the keymaps
     pub index: usize,
@@ -36,14 +47,23 @@ impl Default for Switch {
     fn default() -> Self {
         Self {
             position: u8::MAX,
-            comp: 26,
-            mux: 0,
-            channel: 0,
+            pressed: false,
+
             trig_lower: 20,
             trig_upper: 22,
+
+            rapid_enabled: false,
+            rapid_pressed: false,
+            rapid_position: u8::MAX,
+            rapid_lower: 4,
+            rapid_upper: 4,
+
+            comp: 26,
+
+            mux: 0,
+            channel: 0,
             index: 0,
 
-            pressed: false,
             hold_counter: 0,
             held: false,
         }
@@ -64,37 +84,83 @@ impl Switch {
     }
 
     /// Set the position of the switch based on raw ADC value
-    pub fn value(&mut self, value: u8) {
-        self.position = super::hall::distance(value) - self.comp
+    #[inline(always)]
+    pub fn value(&mut self, value: u8) -> u8 {
+        super::hall::distance(value) - self.comp
+    }
+
+    #[inline(always)]
+    pub fn pressed(&mut self, rapid: bool) {
+        if rapid {
+            self.rapid_pressed = true;
+        } else {
+            self.pressed = true;
+        }
+
+        self.rapid_position = self.position;
+        Keymap::set_key(self.index, true, false);
+    }
+
+    #[inline(always)]
+    pub fn released(&mut self, rapid: bool) {
+        if rapid {
+            self.rapid_pressed = false;
+        } else {
+            self.rapid_pressed = false;
+            self.pressed = false;
+        }
+
+        self.rapid_position = self.position;
+        Keymap::set_key(self.index, false, self.held);
+
+        if self.held {
+            self.held = false;
+            Keymap::set_hold(self.index, false);
+        }
+    }
+
+    #[inline(always)]
+    pub fn held(&mut self, _rapid: bool) {
+        if !self.held && self.hold_counter >= HOLD_TIME {
+            self.held = true;
+            self.hold_counter = 0;
+            Keymap::set_hold(self.index, true);
+        } else {
+            self.hold_counter += 1;
+        }
+    }
+
+    #[inline(always)]
+    pub fn update_rapid(&mut self) {
+        if self.rapid_pressed {
+            if self.position >= (self.rapid_position + self.rapid_upper) {
+                self.rapid_position = self.position;
+                self.released(true)
+            } else {
+                self.held(true);
+            }
+        } else if self.position <= (self.rapid_position - self.rapid_lower) {
+            self.rapid_position = self.position;
+            self.pressed(true)
+        }
     }
 
     /// Update the state of the switch and asociated key with the raw ADC value
     pub fn update(&mut self, value: u8) {
-        self.value(value);
+        self.position = self.value(value);
 
         if self.pressed {
             if self.position >= self.trig_upper {
-                self.pressed = false;
-                Keymap::set_key(self.index, false, self.held);
-
-                if self.held {
-                    self.held = false;
-                    Keymap::set_hold(self.index, false);
-                }
-
+                self.released(false)
             } else {
-                if !self.held && self.hold_counter >= HOLD_TIME {
-                    self.held = true;
-                    self.hold_counter = 0;
-                    Keymap::set_hold(self.index, true);
-                } else {
-                    self.hold_counter += 1;
-                }
+                self.held(false);
             }
         } else if self.position <= self.trig_lower {
-            self.pressed = true;
+            self.pressed(false)
+        }
 
-            Keymap::set_key(self.index, true, false);
+        if self.rapid_enabled {
+            self.update_rapid()
         }
     }
 }
@@ -109,6 +175,23 @@ fn switch_update_trigger() {
     assert_eq!(switch.pressed, true);
     switch.update(107);
     assert_eq!(switch.pressed, false);
+    switch.update(98);
+    assert_eq!(switch.pressed, false);
+}
+
+#[test]
+fn switch_update_rapid_trigger() {
+    let mut switch = Switch::default();
+    switch.rapid_enabled = true;
+
+    switch.update(117);
+    assert_eq!(switch.pressed, true);
+    switch.update(147);
+    assert_eq!(switch.rapid_pressed, true);
+    switch.update(128);
+    assert_eq!(switch.rapid_pressed, false);
+    switch.update(147);
+    assert_eq!(switch.rapid_pressed, true);
     switch.update(98);
     assert_eq!(switch.pressed, false);
 }
