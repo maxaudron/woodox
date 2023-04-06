@@ -25,8 +25,8 @@ switches! {
 
 keymap! {
     0 = layer! [
-          Key(A), Key(B), Key(C), GrvEsc,
-        LayerTap(1, L), Key(F), Key(G), Key(LeftShift),
+            Key(A), Key(B), Key(C), GrvEsc,
+    LayerTap(1, L), Key(F), Key(G), Key(LeftShift),
     ];
     1 = layer! [
         Key(Z), Key(Z), Key(Z), GrvEsc,

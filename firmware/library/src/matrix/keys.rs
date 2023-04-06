@@ -1,4 +1,4 @@
-//! Global state of the keymap and which keys are pressed.
+//! Global state of the keymap an which keys are pressed.
 //!
 //! the keymap and keyboard are stored in a static mut and can only be accessed by
 //! an unsafe function, to make the access a bit easier the Keymap struct provides

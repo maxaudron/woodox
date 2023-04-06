@@ -11,7 +11,7 @@ correlate with the position of the switch on the keyboard in a clear manner.
 On a simple 8-key matrix based keyboard we would e.g. start at the top right and
 increment one by one
 
-```
+```text
 |---|---|---|---|
 | 1 | 2 | 3 | 4 |
 |---|---|---|---|
@@ -21,7 +21,7 @@ increment one by one
 
 The pin assignments on a keyboard using our might worst case be entirely random:
 
-```
+```text
 |---|---|---|---|
 | 3 | 7 | 2 | 6 |
 |---|---|---|---|
