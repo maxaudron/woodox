@@ -1,0 +1,15 @@
+#+title: Latency
+
+* Thought dumb
+#+begin_src
+[00:14:40] <+audron> well, this latency messuring stuff is a bit more complicated
+[00:15:16] <+audron> the on-chip timer does an ok job but i have random outliers that i'm not sure with
+[00:15:38] <+audron> that could either be somethings really stupid i did, or just be random
+[00:17:59] <+audron> the switch scanning loop i'm messuring is on a sepperate core and should be pretty much totally isolated but there might still be some weird interactions by the timer registers themsselfs, or the logging / formatting library
+[00:18:31] <+audron> and messuring off-device is a meh buisness too
+[00:19:02] <+audron> some other guys i've read messure the whole round trip off caps-lock pressed, os working on it, and the led change reported back
+[00:19:38] <+audron> which i guess is fine to compare latency between units on the same setup, but is entirely uncomparable between systems
+[00:20:07] <+audron> and also non of the ones i've seen thus far actually test how the system reacts with multiple button presses
+[00:20:28] <+audron> guess i gotta make my own...
+[00:20:31] -*- audron sighs
+#+end_src

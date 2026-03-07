@@ -1,4 +1,4 @@
-16220071054828868
+16221752109137466
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -156792,6 +156792,13 @@ cherry MX 6028 rearmount rear mount led rgb backlight
 0
 4
 4
+lib
+MX_PLATE_CUROUT
+
+
+0
+0
+0
 lib
 OLED_256x64_I2C
 

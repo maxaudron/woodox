@@ -12,3 +12,8 @@ tmp/
 /macropad/production
 /macropad/output
 /macropad/bom
+
+/woodox/woodox-backups/
+/woodox/production
+/woodox/output
+/woodox/bom
