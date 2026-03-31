@@ -17,3 +17,10 @@ tmp/
 /woodox/production
 /woodox/output
 /woodox/bom
+
+*.lck
+
+*auto_saved_files*
+*_autosave*
+
+*-backups/

@@ -1,5 +1,32 @@
 #+title: Readme
 
+* Decisions
+** MUX controll central vs seperate
+We can either control each mux on it's own, taking up significantly more pins
+or have them be controlled all at the same time
+
+- Much simpler routing
+- less traces
+
+- customize matrix scanning
+
+** Split vs Lefty logic
+either controller on each hand, or controller only on one hand
+
+*** Split
+- can use more mux
+- lower latency?
+- more keys
+- mirror PCB
+  
+*** Lefty
+- less cost
+- simpler?
+- analog signals over longer wire
+  - potential interference?
+
+- sepperate PCB designs
+  
 * TODOs
 ** TODO connect mux com only to uneven GPIO pins for PWM input
 ** DONE add pull up resistors to mux com
