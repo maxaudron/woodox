@@ -7453,7 +7453,7 @@
 		(uuid "35cf4fe8-5281-4376-9d5f-e009182ecb73")
 	)
 	(label "D_SCL"
-		(at 256.54 157.48 270)
+		(at 246.38 157.48 270)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -7513,7 +7513,7 @@
 		(uuid "4253b051-686c-44c6-9dc8-51f99a5a3b56")
 	)
 	(label "D_SDA"
-		(at 254 157.48 270)
+		(at 248.92 157.48 270)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -7523,7 +7523,7 @@
 		(uuid "44581644-1e23-47f1-8d57-5593785acce4")
 	)
 	(label "D_DC"
-		(at 248.92 157.48 270)
+		(at 254 157.48 270)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -7553,7 +7553,7 @@
 		(uuid "4fd1c988-9275-4a3c-8d5d-6d29ee0c0ef3")
 	)
 	(label "D_CS"
-		(at 246.38 157.48 270)
+		(at 256.54 157.48 270)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -8516,7 +8516,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 123.19 328.93 0)
 			(effects
 				(font
@@ -8595,7 +8595,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 148.59 297.18 0)
 			(effects
 				(font
@@ -9335,7 +9335,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 199.39 217.17 0)
 			(effects
 				(font
@@ -9759,7 +9759,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 173.99 328.93 0)
 			(effects
 				(font
@@ -10655,7 +10655,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 288.29 337.82 0)
 			(effects
 				(font
@@ -11530,7 +11530,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 123.19 297.18 0)
 			(effects
 				(font
@@ -11749,7 +11749,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 123.19 270.51 0)
 			(effects
 				(font
@@ -12251,7 +12251,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 250.19 297.18 0)
 			(effects
 				(font
@@ -12539,7 +12539,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 173.99 270.51 0)
 			(effects
 				(font
@@ -12913,7 +12913,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 224.79 270.51 0)
 			(effects
 				(font
@@ -14187,7 +14187,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 123.19 243.84 0)
 			(effects
 				(font
@@ -14553,7 +14553,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 199.39 243.84 0)
 			(effects
 				(font
@@ -14632,7 +14632,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 309.88 337.82 0)
 			(effects
 				(font
@@ -14839,7 +14839,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 173.99 217.17 0)
 			(effects
 				(font
@@ -14918,7 +14918,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 173.99 243.84 0)
 			(effects
 				(font
@@ -15271,7 +15271,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 224.79 297.18 0)
 			(effects
 				(font
@@ -16071,7 +16071,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 199.39 297.18 0)
 			(effects
 				(font
@@ -17353,7 +17353,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 238.76 328.93 0)
 			(effects
 				(font
@@ -18056,7 +18056,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 199.39 270.51 0)
 			(effects
 				(font
@@ -18682,7 +18682,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 173.99 297.18 0)
 			(effects
 				(font
@@ -18889,7 +18889,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 250.19 270.51 0)
 			(effects
 				(font
@@ -18969,7 +18969,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 123.19 217.17 0)
 			(effects
 				(font
@@ -19048,7 +19048,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 199.39 328.93 0)
 			(effects
 				(font
@@ -19589,7 +19589,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 250.19 217.17 0)
 			(effects
 				(font
@@ -19814,7 +19814,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x07_P2.54mm_Vertical"
+		(property "Footprint" "lib:OLED_256x64_I2C"
 			(at 162.56 53.34 0)
 			(effects
 				(font
@@ -20044,7 +20044,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 309.88 312.42 0)
 			(effects
 				(font
@@ -20539,7 +20539,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 288.29 312.42 0)
 			(effects
 				(font
@@ -21093,7 +21093,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 148.59 243.84 0)
 			(effects
 				(font
@@ -21329,7 +21329,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 148.59 217.17 0)
 			(effects
 				(font
@@ -21489,7 +21489,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 250.19 243.84 0)
 			(effects
 				(font
@@ -21809,7 +21809,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 224.79 217.17 0)
 			(effects
 				(font
@@ -22016,7 +22016,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 148.59 270.51 0)
 			(effects
 				(font
@@ -22161,7 +22161,7 @@
 				)
 			)
 		)
-		(property "Footprint" "lib:DRV5057A3_K"
+		(property "Footprint" "lib:DRV505x"
 			(at 224.79 243.84 0)
 			(effects
 				(font
