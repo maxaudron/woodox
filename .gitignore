@@ -24,3 +24,4 @@ tmp/
 *_autosave*
 
 *-backups/
+.history/
