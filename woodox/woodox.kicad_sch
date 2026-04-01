@@ -3,7 +3,7 @@
 	(generator "eeschema")
 	(generator_version "10.0")
 	(uuid "05bdbabb-2097-4fdc-b463-98b1ff4e4498")
-	(paper "A2")
+	(paper "A1" portrait)
 	(lib_symbols
 		(symbol "74xx:74HC4051"
 			(exclude_from_sim no)
@@ -638,6 +638,315 @@
 						)
 					)
 					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Connector:Conn_01x05_Socket"
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "J"
+				(at 0 7.62 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Conn_01x05_Socket"
+				(at 0 -7.62 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Generic connector, single row, 01x05, script generated"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_locked" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "connector"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "Connector*:*_1x??_*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "Conn_01x05_Socket_1_1"
+				(polyline
+					(pts
+						(xy -1.27 5.08) (xy -0.508 5.08)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 2.54) (xy -0.508 2.54)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 0) (xy -0.508 0)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 -2.54) (xy -0.508 -2.54)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.27 -5.08) (xy -0.508 -5.08)
+					)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0 4.572)
+					(mid -0.5058 5.08)
+					(end 0 5.588)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0 2.032)
+					(mid -0.5058 2.54)
+					(end 0 3.048)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0 -0.508)
+					(mid -0.5058 0)
+					(end 0 0.508)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0 -3.048)
+					(mid -0.5058 -2.54)
+					(end 0 -2.032)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 0 -5.588)
+					(mid -0.5058 -5.08)
+					(end 0 -4.572)
+					(stroke
+						(width 0.1524)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 5.08 0)
+					(length 3.81)
+					(name "Pin_1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 2.54 0)
+					(length 3.81)
+					(name "Pin_2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 0 0)
+					(length 3.81)
+					(name "Pin_3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -2.54 0)
+					(length 3.81)
+					(name "Pin_4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -5.08 0)
+					(length 3.81)
+					(name "Pin_5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -7507,6 +7816,16 @@
 	)
 	(wire
 		(pts
+			(xy 76.2 182.88) (xy 78.74 182.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2ea6b072-c043-4a8f-ae49-883c6a314816")
+	)
+	(wire
+		(pts
 			(xy 420.37 243.84) (xy 420.37 247.65)
 		)
 		(stroke
@@ -7914,6 +8233,16 @@
 			(type default)
 		)
 		(uuid "46bc99e7-df65-452a-b898-df75638ce788")
+	)
+	(wire
+		(pts
+			(xy 81.28 182.88) (xy 83.82 182.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "476cb09a-bd07-4696-83ba-f3424c46e2e0")
 	)
 	(wire
 		(pts
@@ -9517,6 +9846,16 @@
 	)
 	(wire
 		(pts
+			(xy 379.73 171.45) (xy 382.27 171.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9a21d682-983c-4e98-8530-f3b31cf220b8")
+	)
+	(wire
+		(pts
 			(xy 44.45 513.08) (xy 54.61 513.08)
 		)
 		(stroke
@@ -10567,6 +10906,16 @@
 	)
 	(wire
 		(pts
+			(xy 374.65 171.45) (xy 377.19 171.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d0ebd5b6-83a5-47b5-8872-fb1ffc21f16f")
+	)
+	(wire
+		(pts
 			(xy 100.33 513.08) (xy 115.57 513.08)
 		)
 		(stroke
@@ -11345,6 +11694,16 @@
 		)
 		(uuid "0093aff6-5b5f-47dc-8bc0-5a55cbb42937")
 	)
+	(label "I2C ACC SDA"
+		(at 198.12 182.88 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "01bf05db-0abd-4109-a781-e6bbcad5bea4")
+	)
 	(label "D_RST"
 		(at 177.8 182.88 270)
 		(effects
@@ -11455,6 +11814,26 @@
 		)
 		(uuid "155db05a-d2a8-4064-98ce-b17ebf80f25f")
 	)
+	(label "I2C ACC R SDL"
+		(at 341.63 190.5 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "1960a114-216d-4207-8536-6f51403588bd")
+	)
+	(label "I2C R SDL"
+		(at 375.92 171.45 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "1da4fdf3-4968-41c5-b2c4-648de636a92e")
+	)
 	(label "MUX4R COM"
 		(at 424.18 168.91 270)
 		(effects
@@ -11474,6 +11853,16 @@
 			(justify right bottom)
 		)
 		(uuid "21e2c770-490e-4963-82e7-ed4a415b3cd1")
+	)
+	(label "I2C ACC SDA"
+		(at 52.07 195.58 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "2360305c-5cd3-437f-9069-8b1c65d554fb")
 	)
 	(label "QSPI_SD1"
 		(at 172.72 132.08 90)
@@ -11665,6 +12054,16 @@
 		)
 		(uuid "494437bf-2483-4fff-a060-ccac4ba4895c")
 	)
+	(label "I2C SDA"
+		(at 82.55 182.88 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "4b0f485c-95a8-4e05-af60-0bd1b9b32367")
+	)
 	(label "USB_D+"
 		(at 185.42 99.06 270)
 		(effects
@@ -11755,6 +12154,16 @@
 		)
 		(uuid "58b1dd5f-68a2-4e8f-9b1a-c7e8901f1dd0")
 	)
+	(label "I2C R SDA"
+		(at 381 171.45 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "5a308cb5-67a8-4d25-8666-4fc5cc0ec124")
+	)
 	(label "D_SDA_R"
 		(at 44.45 74.93 180)
 		(effects
@@ -11814,6 +12223,16 @@
 			(justify right bottom)
 		)
 		(uuid "6792feec-7d79-47d5-9eb4-3f4d59990561")
+	)
+	(label "I2C R SDA"
+		(at 452.12 168.91 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "69038333-1dd4-4ccc-98cd-5b90528d1192")
 	)
 	(label "SWCLK"
 		(at 132.08 132.08 90)
@@ -12055,6 +12474,16 @@
 		)
 		(uuid "a1dd2f9b-6ab7-436d-83a4-15d50f312f61")
 	)
+	(label "I2C ACC R SDA"
+		(at 341.63 193.04 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "a3fcce45-a9d4-481b-a8a5-67f0588bae5c")
+	)
 	(label "QSPI_R_SD0"
 		(at 392.43 116.84 0)
 		(effects
@@ -12094,6 +12523,16 @@
 			(justify left bottom)
 		)
 		(uuid "b0f15fa3-675d-40d8-84f0-c3e8921fb520")
+	)
+	(label "I2C R SDL"
+		(at 449.58 168.91 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "b3bcac09-cc2a-401f-abe7-7d9a627e581f")
 	)
 	(label "QSPI_R_SD1"
 		(at 356.87 111.76 180)
@@ -12145,6 +12584,16 @@
 		)
 		(uuid "b7ef9cd9-c989-4d5e-a33f-54566a367202")
 	)
+	(label "I2C ACC R SDA"
+		(at 492.76 168.91 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "b7fb1094-e430-42c1-a384-c51c49b7cad9")
+	)
 	(label "LED"
 		(at 144.78 182.88 270)
 		(effects
@@ -12185,6 +12634,16 @@
 		)
 		(uuid "c0c70711-a421-4649-b5f8-46aaeddca29a")
 	)
+	(label "I2C ACC SDL"
+		(at 195.58 182.88 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "c11dfc02-71a7-4893-96c3-01edab46a785")
+	)
 	(label "MUX R S0"
 		(at 431.8 168.91 270)
 		(effects
@@ -12224,6 +12683,16 @@
 			(justify right bottom)
 		)
 		(uuid "c2ae0fd4-6540-4817-820d-b31dd55c1095")
+	)
+	(label "I2C ACC SDL"
+		(at 52.07 193.04 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "c2bc9ac7-e1cc-40df-beb5-82747132a1de")
 	)
 	(label "QSPI_SD3"
 		(at 167.64 132.08 90)
@@ -12355,6 +12824,16 @@
 		)
 		(uuid "db75002f-b6b2-4cb2-b818-ccc6c5a1d1b4")
 	)
+	(label "I2C SDL"
+		(at 77.47 182.88 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "dbfdf022-2966-4b3e-b80a-b334e3ed2b87")
+	)
 	(label "D_SDA"
 		(at 34.29 74.93 180)
 		(effects
@@ -12374,6 +12853,16 @@
 			(justify right bottom)
 		)
 		(uuid "dfc7d94b-d053-43e6-8274-f2fc7a47f2b4")
+	)
+	(label "I2C SDA"
+		(at 157.48 182.88 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "e12e0ec8-2841-4ca9-b527-05d6fd725263")
 	)
 	(label "MUX1R COM"
 		(at 537.21 208.28 0)
@@ -12455,6 +12944,16 @@
 		)
 		(uuid "ef6adab5-35fd-472e-b031-7c44e8fafa32")
 	)
+	(label "I2C ACC R SDL"
+		(at 490.22 168.91 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "f107477b-59b2-49f2-bd72-57cd06e49e0b")
+	)
 	(label "D_DC"
 		(at 34.29 80.01 180)
 		(effects
@@ -12514,6 +13013,16 @@
 			(justify right bottom)
 		)
 		(uuid "fe6432e8-97fe-4d51-a912-948e292b4dc3")
+	)
+	(label "I2C SDL"
+		(at 154.94 182.88 270)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "fe6dab23-2abb-48fb-b6e7-6bd8c12b0a67")
 	)
 	(symbol
 		(lib_id "power:+5V")
@@ -14567,6 +15076,97 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:R")
+		(at 88.9 186.69 180)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "137c6122-10b4-4dd8-86e1-5f9bc58eb21a")
+		(property "Reference" "R18"
+			(at 86.868 188.468 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "56k"
+			(at 88.9 188.214 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 90.678 186.69 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 88.9 186.69 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 88.9 186.69 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "ERJ-3EKF1002V"
+			(at 88.9 186.69 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "64d3cc7a-c37e-4f58-9827-eadc7f3782c3")
+		)
+		(pin "2"
+			(uuid "668ff7f8-44a1-491d-b837-951b00189bc3")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "R18")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:GND")
 		(at 354.33 342.9 0)
 		(unit 1)
@@ -16066,6 +16666,97 @@
 			(project "woodox"
 				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
 					(reference "#PWR0169")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 387.35 175.26 180)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "1ec1e2dc-3e19-4d79-83f3-37c8f4b1a7e4")
+		(property "Reference" "R19"
+			(at 385.318 177.038 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "56k"
+			(at 387.35 176.784 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 389.128 175.26 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 387.35 175.26 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 387.35 175.26 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "ERJ-3EKF1002V"
+			(at 387.35 175.26 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "1de15fe6-76a9-4e55-9957-5cd2c7ce5eb4")
+		)
+		(pin "2"
+			(uuid "efa77897-32fe-4b75-9f30-6a151d97c3d8")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "R19")
 					(unit 1)
 				)
 			)
@@ -17809,6 +18500,97 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:R")
+		(at 91.44 186.69 180)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "30386b1b-dc79-43fa-81c6-ffd098d567a7")
+		(property "Reference" "R17"
+			(at 93.726 188.722 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "56k"
+			(at 91.44 188.214 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 93.218 186.69 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 91.44 186.69 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 91.44 186.69 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "ERJ-3EKF1002V"
+			(at 91.44 186.69 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "6e0e4918-5ece-4cdb-8b83-bfafc075de71")
+		)
+		(pin "2"
+			(uuid "47953f13-7f74-48c0-a67c-28e9549890cf")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "R17")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Sensor_Magnetic:DRV5055A3xDBZxQ1")
 		(at 100.33 354.33 90)
 		(unit 1)
@@ -17991,6 +18773,83 @@
 			(project "woodox"
 				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
 					(reference "LED8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+5V")
+		(at 88.9 190.5 180)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "30fecb11-b9dd-4e2b-bc9b-98de560f6927")
+		(property "Reference" "#PWR0107"
+			(at 88.9 186.69 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+5V"
+			(at 88.9 197.612 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 88.9 190.5 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 88.9 190.5 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 88.9 190.5 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "b320d286-2a7e-4746-b284-15b2f12b7db7")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "#PWR0107")
 					(unit 1)
 				)
 			)
@@ -19222,6 +20081,83 @@
 			(project "woodox"
 				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
 					(reference "R12")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 328.93 148.59 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "3cd4bf6b-9a50-4c96-aa21-e94bdce57cac")
+		(property "Reference" "#PWR0224"
+			(at 328.93 154.94 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 328.93 153.67 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 328.93 148.59 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 328.93 148.59 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 328.93 148.59 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "96411bb2-2adc-461b-b5d1-9f0cb7cb284f")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "#PWR0224")
 					(unit 1)
 				)
 			)
@@ -21478,6 +22414,83 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+5V")
+		(at 387.35 179.07 180)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "52335a6a-3bc1-40e9-bca3-f721e8cb0ffc")
+		(property "Reference" "#PWR0108"
+			(at 387.35 175.26 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+5V"
+			(at 387.35 186.182 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 387.35 179.07 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 387.35 179.07 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 387.35 179.07 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "5468368f-c271-4d5c-802f-474db8c83531")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "#PWR0108")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:C_Small")
 		(at 142.24 121.92 0)
 		(unit 1)
@@ -22240,6 +23253,166 @@
 			(project "woodox"
 				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
 					(reference "Y1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_name "USB_C_Receptacle_1")
+		(lib_id "Connector:USB_C_Receptacle")
+		(at 71.12 167.64 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "56c4fc2f-ce6d-45d4-b7ec-db827dfc0c7f")
+		(property "Reference" "J6"
+			(at 67.31 152.4 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "USB_C_Interlink"
+			(at 67.31 154.94 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_USB:USB_C_Receptacle_Amphenol_12401610E4-2A"
+			(at 71.12 171.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.usb.org/sites/default/files/documents/usb_type-c.zip"
+			(at 71.12 171.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 71.12 167.64 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "12401832E402A"
+			(at 71.12 167.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "A1"
+			(uuid "304e9545-f304-4f79-b90e-308cce5ebe3b")
+		)
+		(pin "A10"
+			(uuid "9b42479b-c6b9-4d9b-8e9f-dc0ed5650479")
+		)
+		(pin "A11"
+			(uuid "80036b4f-083d-4c72-a3f3-ff906186f553")
+		)
+		(pin "A12"
+			(uuid "e3aa54e9-eace-4811-bfb5-ca21994be58c")
+		)
+		(pin "A2"
+			(uuid "1bd62903-168c-446e-b8e3-baa65ae99add")
+		)
+		(pin "A3"
+			(uuid "a3c8195a-2750-41d7-8077-96d3c71c76c6")
+		)
+		(pin "A4"
+			(uuid "454bd315-4bf9-4f12-8d0b-a7df06dbbbe3")
+		)
+		(pin "A5"
+			(uuid "19eeb931-9c53-4fb8-855a-6284b904fa24")
+		)
+		(pin "A6"
+			(uuid "1f305423-6642-4d71-b822-23aae89f8530")
+		)
+		(pin "A7"
+			(uuid "ec4b3dec-109a-4718-acfc-718bcb958152")
+		)
+		(pin "A8"
+			(uuid "ec829609-51db-46fa-b3c3-19c715645883")
+		)
+		(pin "A9"
+			(uuid "5226ec0b-27ef-4987-a46a-964c53613e5e")
+		)
+		(pin "B1"
+			(uuid "bdaa4c3e-1f01-4f81-9278-052887c98761")
+		)
+		(pin "B10"
+			(uuid "6f9d9f83-1fff-4cd8-9202-26db4404f8fe")
+		)
+		(pin "B11"
+			(uuid "c0635212-a206-4385-80a0-c1d752d78111")
+		)
+		(pin "B12"
+			(uuid "7d215648-b67c-4e6f-ae12-5a90cdc77833")
+		)
+		(pin "B2"
+			(uuid "382cedad-2189-48af-abfd-54b375913254")
+		)
+		(pin "B3"
+			(uuid "95e10c27-c5a7-4daf-b015-a2ee7c2f0f46")
+		)
+		(pin "B4"
+			(uuid "30f11b15-67e5-41bd-b3c9-ab6f5892c2f9")
+		)
+		(pin "B5"
+			(uuid "2b7c46a1-35ea-434d-b344-ce83b06cd3c9")
+		)
+		(pin "B6"
+			(uuid "dd02f4ca-a02a-4793-ac47-356db3168802")
+		)
+		(pin "B7"
+			(uuid "e836cc6d-08fb-401c-bbe8-b22c5b52d672")
+		)
+		(pin "B8"
+			(uuid "a4c0fc81-a84c-4c08-99d6-9c020f785962")
+		)
+		(pin "B9"
+			(uuid "35ed74ea-ae11-466b-a87d-92c3edc211eb")
+		)
+		(pin "SH"
+			(uuid "0108f0fc-89f5-4df5-aecb-49b9753d85c8")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "J6")
 					(unit 1)
 				)
 			)
@@ -23346,7 +24519,7 @@
 				)
 			)
 		)
-		(property "Value" "USB_C_Receptacle"
+		(property "Value" "USB_C_To_Host"
 			(at 471.17 54.61 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -23993,6 +25166,83 @@
 			(project "woodox"
 				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
 					(reference "U54")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3.3V")
+		(at 341.63 198.12 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "63fb06f9-d63d-4a20-940c-242ff0889e57")
+		(property "Reference" "#PWR0220"
+			(at 345.44 198.12 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+3.3VR"
+			(at 338.074 198.12 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 341.63 198.12 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 341.63 198.12 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 341.63 198.12 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "9e79b7fe-d3dd-4e7d-b677-d9e7d4b3112f")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "#PWR0220")
 					(unit 1)
 				)
 			)
@@ -26579,6 +27829,97 @@
 		)
 	)
 	(symbol
+		(lib_id "Connector:Conn_01x05_Socket")
+		(at 57.15 195.58 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "730b1c8e-9fe0-4ef5-b482-ca3a670bb2d0")
+		(property "Reference" "J8"
+			(at 58.42 194.3099 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Conn_01x05_Socket"
+			(at 58.42 196.8499 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "lib:TestPad_5pins"
+			(at 57.15 195.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 57.15 195.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x05, script generated"
+			(at 57.15 195.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "2"
+			(uuid "7a53c361-10fe-49fd-b0e0-0dfda32305f4")
+		)
+		(pin "5"
+			(uuid "c117b953-345b-4fc0-8f24-d0abfbd3b732")
+		)
+		(pin "3"
+			(uuid "7a87c9ab-4ef2-4e79-a7fd-dbb8e18f5658")
+		)
+		(pin "4"
+			(uuid "f1e244d0-e0f5-4314-ab1c-6a760ad54f7d")
+		)
+		(pin "1"
+			(uuid "c15a2a9b-6ed0-4c60-9adc-007887ee1cc3")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "J8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:C_Small")
 		(at 152.4 121.92 0)
 		(unit 1)
@@ -28213,7 +29554,7 @@
 		(fields_autoplaced yes)
 		(uuid "7f5989b4-aa55-4008-bece-e658d8f7fc57")
 		(property "Reference" "J2"
-			(at 176.53 66.04 90)
+			(at 176.53 63.5 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -28222,8 +29563,8 @@
 				)
 			)
 		)
-		(property "Value" "USB_C_Receptacle"
-			(at 176.53 68.58 90)
+		(property "Value" "USB_C_To_Host"
+			(at 176.53 66.04 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -28255,7 +29596,7 @@
 			)
 		)
 		(property "Description" "USB Full-Featured Type-C Receptacle connector"
-			(at 180.34 81.28 0)
+			(at 176.53 68.58 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -29100,6 +30441,83 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+5V")
+		(at 389.89 179.07 180)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "86a794de-28d6-4870-871a-f3b6fc288e67")
+		(property "Reference" "#PWR0115"
+			(at 389.89 175.26 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+5V"
+			(at 389.89 186.182 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 389.89 179.07 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 389.89 179.07 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 389.89 179.07 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "c02b0872-74dc-4ed8-8145-1e983703298d")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "#PWR0115")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "marbastlib-mx:MX_SK6812MINI-E")
 		(at 450.85 462.28 180)
 		(unit 1)
@@ -29454,6 +30872,84 @@
 			(project "woodox"
 				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
 					(reference "LED33")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+5V")
+		(at 394.97 171.45 180)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "896e9432-4be1-4a96-b25e-86bb3dcc68a4")
+		(property "Reference" "#PWR0116"
+			(at 394.97 167.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+5V"
+			(at 397.51 172.7199 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 394.97 171.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 394.97 171.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 394.97 171.45 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "d87234fe-9d4f-4889-9f59-6a80a4188602")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "#PWR0116")
 					(unit 1)
 				)
 			)
@@ -29964,6 +31460,83 @@
 			(project "woodox"
 				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
 					(reference "LED41")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 30.48 160.02 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "8aa59542-64e0-4130-a95c-83b7781f147f")
+		(property "Reference" "#PWR0222"
+			(at 30.48 166.37 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 30.48 165.1 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 30.48 160.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 30.48 160.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 30.48 160.02 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "1ee48d6f-3cef-4b1c-8eaa-b5d997421ed1")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "#PWR0222")
 					(unit 1)
 				)
 			)
@@ -31665,6 +33238,84 @@
 			(project "woodox"
 				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
 					(reference "LED6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 341.63 187.96 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "96139605-c77c-40a6-b67c-09404a7484ce")
+		(property "Reference" "#PWR0226"
+			(at 335.28 187.96 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 337.82 187.9599 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 341.63 187.96 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 341.63 187.96 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 341.63 187.96 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "7dcd3e31-4489-41ea-b97d-cc3307fffbb5")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "#PWR0226")
 					(unit 1)
 				)
 			)
@@ -33827,6 +35478,83 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+5V")
+		(at 52.07 198.12 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "a6958d00-3f7d-47b3-a617-a995cc3477c6")
+		(property "Reference" "#PWR0118"
+			(at 55.88 198.12 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+5V"
+			(at 44.958 198.12 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 52.07 198.12 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 52.07 198.12 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 52.07 198.12 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "1514555d-bcb8-477b-9636-2a4654f4559e")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "#PWR0118")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:+3.3V")
 		(at 39.37 325.12 180)
 		(unit 1)
@@ -34224,6 +35952,97 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:R")
+		(at 389.89 175.26 180)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "a8fbd321-f510-45ea-addd-b30ff312165a")
+		(property "Reference" "R20"
+			(at 392.176 177.292 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Value" "56k"
+			(at 389.89 176.784 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
+			(at 391.668 175.26 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 389.89 175.26 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 389.89 175.26 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "ERJ-3EKF1002V"
+			(at 389.89 175.26 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "0aced4a8-bd07-4720-8411-20f380ebdf89")
+		)
+		(pin "2"
+			(uuid "1ff6a14d-79ab-4ae1-bd98-ee3cd9b021b7")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "R20")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:GND")
 		(at 520.7 97.79 0)
 		(unit 1)
@@ -34371,6 +36190,83 @@
 			(project "woodox"
 				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
 					(reference "#PWR098")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 328.93 156.21 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "ab1b2a42-5a94-44bb-a35b-b8686a4c9924")
+		(property "Reference" "#PWR0225"
+			(at 328.93 162.56 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 328.93 161.29 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 328.93 156.21 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 328.93 156.21 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 328.93 156.21 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "2040444f-8d89-4981-b982-1f973011f9ce")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "#PWR0225")
 					(unit 1)
 				)
 			)
@@ -37832,6 +39728,166 @@
 		)
 	)
 	(symbol
+		(lib_name "USB_C_Receptacle_1")
+		(lib_id "Connector:USB_C_Receptacle")
+		(at 369.57 156.21 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "c06c530c-ba2a-400a-9fb8-e6716a1fc7b0")
+		(property "Reference" "J7"
+			(at 365.76 140.97 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "USB_C_Interlink"
+			(at 365.76 143.51 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Connector_USB:USB_C_Receptacle_Amphenol_12401610E4-2A"
+			(at 369.57 160.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "https://www.usb.org/sites/default/files/documents/usb_type-c.zip"
+			(at 369.57 160.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 369.57 156.21 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "12401832E402A"
+			(at 369.57 156.21 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "A1"
+			(uuid "e6cdf176-c2d9-4ee2-a3ca-7ab1dd33fb49")
+		)
+		(pin "A10"
+			(uuid "b2348e4a-fc30-41d0-901a-e3ddf79a8ec1")
+		)
+		(pin "A11"
+			(uuid "64ea7301-ad6b-4244-875c-8b838038d2bc")
+		)
+		(pin "A12"
+			(uuid "fb079813-6115-402c-903c-74248a8a1bba")
+		)
+		(pin "A2"
+			(uuid "75f88243-adb9-477f-ac9c-141d60ab8cc8")
+		)
+		(pin "A3"
+			(uuid "fdec7dc4-a32e-467e-89e6-3b17834b2e5b")
+		)
+		(pin "A4"
+			(uuid "81083439-c06f-49f0-a824-5c38006f1b4b")
+		)
+		(pin "A5"
+			(uuid "ddf5929c-f7be-4eae-beac-924287d48458")
+		)
+		(pin "A6"
+			(uuid "15223962-819b-49bf-a455-e7c78fc1f928")
+		)
+		(pin "A7"
+			(uuid "6c279c0d-4ed1-41b3-bc5a-1e6ed4ab5a53")
+		)
+		(pin "A8"
+			(uuid "78835982-f65b-4969-9dce-34c91f9891c5")
+		)
+		(pin "A9"
+			(uuid "4b9a8ea1-3802-4df0-aa66-b439632c5c97")
+		)
+		(pin "B1"
+			(uuid "1b552b5b-c39e-4a91-b5af-0e02e8ee40b9")
+		)
+		(pin "B10"
+			(uuid "ea80a362-1865-4192-bccb-dd3fe91d5938")
+		)
+		(pin "B11"
+			(uuid "0c02cdcc-46db-4d03-b4f2-403087f1c7cd")
+		)
+		(pin "B12"
+			(uuid "ad1057df-2703-452e-855a-cebe5554f1e3")
+		)
+		(pin "B2"
+			(uuid "55bb4547-2783-4dda-9c40-7fb143af1933")
+		)
+		(pin "B3"
+			(uuid "d75bf572-1d55-4bbe-8d5a-d956d0427399")
+		)
+		(pin "B4"
+			(uuid "07451133-6d6a-4fc9-a4ea-4e55bfb3236b")
+		)
+		(pin "B5"
+			(uuid "8e0ca545-3b30-437c-9688-b7a0670efd17")
+		)
+		(pin "B6"
+			(uuid "6955950b-218b-4374-a366-2cf9294d1c91")
+		)
+		(pin "B7"
+			(uuid "a07d496d-f70a-413d-a993-049a71dc62f1")
+		)
+		(pin "B8"
+			(uuid "272955e1-8ecf-47f4-8b3a-f67300a68e1a")
+		)
+		(pin "B9"
+			(uuid "e56df6ff-985a-49df-a148-532f82769acd")
+		)
+		(pin "SH"
+			(uuid "0a7ceea6-5314-4e7e-90c8-63bef9ef106f")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "J7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "marbastlib-mx:MX_SK6812MINI-E")
 		(at 389.89 477.52 0)
 		(unit 1)
@@ -38342,6 +40398,84 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+5V")
+		(at 96.52 182.88 180)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "c3b511de-8a4a-418f-94b5-37a7bf7e799a")
+		(property "Reference" "#PWR0104"
+			(at 96.52 179.07 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+5V"
+			(at 99.06 184.1499 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 96.52 182.88 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 96.52 182.88 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 96.52 182.88 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "97efd989-a25e-4f2c-a756-429f7f9309df")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "#PWR0104")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:+3.3V")
 		(at 334.01 231.14 180)
 		(unit 1)
@@ -38583,6 +40717,83 @@
 			(project "woodox"
 				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
 					(reference "U43")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 30.48 167.64 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "c5b133ae-cdea-4270-b7f6-2c48a47e1ffb")
+		(property "Reference" "#PWR0223"
+			(at 30.48 173.99 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 30.48 172.72 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 30.48 167.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 30.48 167.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 30.48 167.64 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "83bfadf3-3905-40ea-925c-ccabb33eb7cc")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "#PWR0223")
 					(unit 1)
 				)
 			)
@@ -39808,6 +42019,84 @@
 			(project "woodox"
 				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
 					(reference "#PWR0145")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 52.07 190.5 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "d2346bb1-7483-46b9-8e7d-93d7341c7c33")
+		(property "Reference" "#PWR0227"
+			(at 45.72 190.5 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "GND"
+			(at 48.26 190.4999 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 52.07 190.5 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 52.07 190.5 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 52.07 190.5 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "7f8d346c-01f9-4eac-9e99-e6de03676a18")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "#PWR0227")
 					(unit 1)
 				)
 			)
@@ -41160,6 +43449,83 @@
 			(project "woodox"
 				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
 					(reference "LED64")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+5V")
+		(at 341.63 195.58 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "db252662-4a3a-456c-a2b6-0a1b720b3b18")
+		(property "Reference" "#PWR0117"
+			(at 345.44 195.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+5V"
+			(at 334.518 195.58 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 341.63 195.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 341.63 195.58 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 341.63 195.58 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "f01f49fb-0f6a-4124-ae61-254fee8b0917")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "#PWR0117")
 					(unit 1)
 				)
 			)
@@ -43328,6 +45694,83 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+5V")
+		(at 91.44 190.5 180)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "e6f01609-bd8b-46c5-821a-20e81f6974ad")
+		(property "Reference" "#PWR0105"
+			(at 91.44 186.69 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+5V"
+			(at 91.44 197.612 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 91.44 190.5 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 91.44 190.5 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 91.44 190.5 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "46720581-866d-4655-9384-76f22c849ea1")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "#PWR0105")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "marbastlib-mx:MX_SK6812MINI-E")
 		(at 389.89 492.76 180)
 		(unit 1)
@@ -44760,6 +47203,83 @@
 			(project "woodox"
 				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
 					(reference "LED19")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3.3V")
+		(at 52.07 200.66 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "ee6419a2-f90b-4518-a807-fc81f0e89d6d")
+		(property "Reference" "#PWR0221"
+			(at 55.88 200.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+3.3V"
+			(at 48.514 200.66 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 52.07 200.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 52.07 200.66 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 52.07 200.66 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "84f237bd-b0a8-4718-9ef1-277ee905cfc5")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "#PWR0221")
 					(unit 1)
 				)
 			)
@@ -46342,6 +48862,97 @@
 			(project "woodox"
 				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
 					(reference "#PWR0193")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:Conn_01x05_Socket")
+		(at 346.71 193.04 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "fab6b448-1d83-4dfc-9910-f66697602c17")
+		(property "Reference" "J5"
+			(at 347.98 191.7699 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Conn_01x05_Socket"
+			(at 347.98 194.3099 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "lib:TestPad_5pins"
+			(at 346.71 193.04 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 346.71 193.04 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Generic connector, single row, 01x05, script generated"
+			(at 346.71 193.04 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "2"
+			(uuid "e2a9cb28-6637-4a81-b29f-e6b8bccda18f")
+		)
+		(pin "5"
+			(uuid "12aae105-bd95-4e76-9f91-4ede2f60effb")
+		)
+		(pin "3"
+			(uuid "220f3a0d-da30-4e25-a715-81e6fa22406b")
+		)
+		(pin "4"
+			(uuid "b1d3bfd0-f029-42fd-b64f-4b1f6a7fb667")
+		)
+		(pin "1"
+			(uuid "83149653-10c2-4635-92f3-3a102d40fccc")
+		)
+		(instances
+			(project "woodox"
+				(path "/05bdbabb-2097-4fdc-b463-98b1ff4e4498"
+					(reference "J5")
 					(unit 1)
 				)
 			)
