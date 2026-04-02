@@ -50,7 +50,7 @@
         "silk_text_thickness": 0.1,
         "silk_text_upright": false,
         "zones": {
-          "min_clearance": 0.2
+          "min_clearance": 0.15
         }
       },
       "diff_pair_dimensions": [
@@ -60,20 +60,7 @@
           "width": 0.0
         }
       ],
-      "drc_exclusions": [
-        [
-          "lib_footprint_mismatch|161621763|80240075|5b108e59-e263-4cff-bc9c-3b23e4125ab7|00000000-0000-0000-0000-000000000000",
-          ""
-        ],
-        [
-          "lib_footprint_mismatch|163127750|65531203|dfe3476c-7c25-43a5-a4ef-339a6733ae19|00000000-0000-0000-0000-000000000000",
-          ""
-        ],
-        [
-          "lib_footprint_mismatch|168970894|87659912|5694ac31-94eb-456f-b6be-f24fa439fe55|00000000-0000-0000-0000-000000000000",
-          ""
-        ]
-      ],
+      "drc_exclusions": [],
       "meta": {
         "version": 2
       },
@@ -726,7 +713,7 @@
       "default_line_thickness": 6.0,
       "default_text_size": 50.0,
       "field_names": [],
-      "hop_over_size_choice": 0,
+      "hop_over_size_choice": 3,
       "intersheets_ref_own_page": false,
       "intersheets_ref_prefix": "",
       "intersheets_ref_short": false,
@@ -767,8 +754,12 @@
         "uuid": "05bdbabb-2097-4fdc-b463-98b1ff4e4498"
       }
     ],
-    "used_designators": "J3,J5-8,#PWR101-105,#PWR107-108,#PWR115-118,#PWR187,#PWR189,#PWR191,#PWR193,#PWR220-227,R17-20,JP1-6",
-    "variants": []
+    "used_designators": "",
+    "variants": [
+      {
+        "name": "rp2350"
+      }
+    ]
   },
   "sheets": [
     [
