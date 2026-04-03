@@ -1,0 +1,83 @@
+(footprint "TestPad_3pins"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(property "Reference" "J5"
+		(at 0 2.5 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(hide yes)
+		(uuid "3a5db5a3-6025-42dc-881d-47b87e4a94f9")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+		)
+	)
+	(property "Value" "Conn_01x05_Socket"
+		(at 0 4 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "4bc4b611-9f40-4333-b8fb-68bdb03146f9")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "86acb504-1607-4f62-828c-088e2492e7f9")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" "Generic connector, single row, 01x05, script generated"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "85eb861e-0024-465f-b8ec-4dfeeea7fd45")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property ki_fp_filters "Connector*:*_1x??_*")
+	(sheetname "/")
+	(sheetfile "woodox.kicad_sch")
+	(attr through_hole)
+	(duplicate_pad_numbers_are_jumpers no)
+	(pad "1" smd roundrect
+		(at -1.5 0)
+		(size 1.25 1.25)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.2)
+		(uuid "e0f875e2-cd59-445d-964a-ba27028e2ddc")
+	)
+	(pad "2" smd circle
+		(at 0 0)
+		(size 1.25 1.25)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "6222a17a-f05e-401c-813b-3b1e2f2b160e")
+	)
+	(pad "3" smd circle
+		(at 1.5 0)
+		(size 1.25 1.25)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "e09f1cdf-3dae-4d0d-8d19-a53c23c7e9d2")
+	)
+	(embedded_fonts no)
+)

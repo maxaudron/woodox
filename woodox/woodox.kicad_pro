@@ -39,9 +39,9 @@
         "other_text_thickness": 0.15,
         "other_text_upright": false,
         "pads": {
-          "drill": 0.8,
-          "height": 1.27,
-          "width": 2.54
+          "drill": 0.0,
+          "height": 4.3,
+          "width": 3.4
         },
         "silk_line_width": 0.1,
         "silk_text_italic": false,
@@ -759,7 +759,7 @@
         "uuid": "05bdbabb-2097-4fdc-b463-98b1ff4e4498"
       }
     ],
-    "used_designators": "",
+    "used_designators": "J3,J9-12,#PWR71,#PWR78-79,#PWR81,#PWR114",
     "variants": [
       {
         "name": "rp2350"
