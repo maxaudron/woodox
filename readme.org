@@ -18,6 +18,8 @@ either controller on each hand, or controller only on one hand
 - lower latency?
 - more keys
 - mirror PCB
+
+CD74HC4051
   
 *** Lefty
 - less cost

@@ -3,17 +3,15 @@
     substituters = [
       "https://cache.nixos.org/"
       "https://nix-community.cachix.org"
-      "https://nix.cache.vapor.systems"
     ];
     trusted-public-keys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      "nix.cache.vapor.systems-1:OjV+eZuOK+im1n8tuwHdT+9hkQVoJORdX96FvWcMABk="
     ];
   };
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
 
     fenix = {
       url = "github:nix-community/fenix";
@@ -37,15 +35,14 @@
         rustToolchain = with fenix.packages.${system};
           fromToolchainFile {
             file = ./firmware/rust-toolchain.toml;
-            sha256 = "sha256-JvgrOEGMM0N+6Vsws8nUq0W/PJPxkf5suZjgEtAzG6I=";
+            hash = fakeHash;
           };
 
         nativeBuildInputs = with pkgs;
           [
             rustToolchain
 
-            cargo-embed
-            probe-run
+            probe-rs-tools
             flip-link
             elf2uf2-rs
             gcc-arm-embedded

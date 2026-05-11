@@ -1,7 +1,8 @@
 [workspace]
 resolver = "2"
 members = [
-  "board",
+  "boards/rp2040",
+  "boards/rp2350",
   "library",
 ]
 
