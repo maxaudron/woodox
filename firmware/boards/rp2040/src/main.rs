@@ -10,7 +10,7 @@ use defmt::*;
 use defmt_rtt as _;
 use panic_probe as _;
 
-use hal::{clocks, entry, pac, watchdog, Adc};
+use hal::{Adc, clocks, entry, pac, watchdog};
 
 mod hardware;
 mod scan;
@@ -20,13 +20,13 @@ use woodox_lib::layout;
 
 /// The linker will place this boot block at the start of our program image. We
 /// need this to help the ROM bootloader get our code up and running.
-#[link_section = ".boot2"]
+#[unsafe(link_section = ".boot2")]
 #[used]
 pub static BOOT2: [u8; 256] = rp2040_boot2::BOOT_LOADER_GENERIC_03H;
 
 pub const DMA_BUF_SIZE: usize = 4;
 
-static mut CORE1_STACK: Stack<4096> = Stack::new();
+static CORE1_STACK: Stack<4096> = Stack::new();
 
 #[entry]
 fn main() -> ! {
@@ -54,7 +54,7 @@ fn main() -> ! {
     .unwrap();
 
     #[allow(unused_variables)]
-    let timer = hal::Timer::new(pac.TIMER, &mut pac.RESETS);
+    let timer = hal::Timer::new(pac.TIMER, &mut pac.RESETS, &clocks);
 
     let pins = Pins::new(
         pac.IO_BANK0,
@@ -85,11 +85,11 @@ fn main() -> ! {
         let _adc_pin_3 = pins.mux4_com.into_floating_input();
 
         let adc = adc.free();
-        adc.cs.modify(|_, w| unsafe { w.rrobin().bits(0b01111) });
+        adc.cs().modify(|_, w| unsafe { w.rrobin().bits(0b01111) });
 
-        adc.cs.modify(|_, w| unsafe { w.ainsel().bits(0) });
-        adc.cs.modify(|_, w| w.en().set_bit());
-        while !adc.cs.read().ready().bit_is_set() {
+        adc.cs().modify(|_, w| unsafe { w.ainsel().bits(0) });
+        adc.cs().modify(|_, w| w.en().set_bit());
+        while !adc.cs().read().ready().bit_is_set() {
             cortex_m::asm::nop();
         }
 
@@ -113,7 +113,7 @@ fn main() -> ! {
     let mut mc = Multicore::new(&mut pac.PSM, &mut pac.PPB, &mut sio.fifo);
     let cores = mc.cores();
     let core1 = &mut cores[1];
-    let _scan = core1.spawn(unsafe { &mut CORE1_STACK.mem }, || scan::scan(adc, mux));
+    let _scan = core1.spawn(CORE1_STACK.take().unwrap(), || scan::scan(adc, mux));
 
     // ------------------------------------
     // Start usb controlelr loop on core 0

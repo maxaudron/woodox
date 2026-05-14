@@ -170,28 +170,30 @@ fn switch_update_trigger() {
     let mut switch = Switch::default();
 
     switch.update(117);
-    assert_eq!(switch.pressed, true);
+    assert!(switch.pressed);
     switch.update(110);
-    assert_eq!(switch.pressed, true);
+    assert!(switch.pressed);
     switch.update(107);
-    assert_eq!(switch.pressed, false);
+    assert!(!switch.pressed);
     switch.update(98);
-    assert_eq!(switch.pressed, false);
+    assert!(!switch.pressed);
 }
 
 #[test]
 fn switch_update_rapid_trigger() {
-    let mut switch = Switch::default();
-    switch.rapid_enabled = true;
+    let mut switch = Switch {
+        rapid_enabled: true,
+        ..Default::default()
+    };
 
     switch.update(117);
-    assert_eq!(switch.pressed, true);
+    assert!(switch.pressed);
     switch.update(147);
-    assert_eq!(switch.rapid_pressed, true);
+    assert!(switch.rapid_pressed);
     switch.update(128);
-    assert_eq!(switch.rapid_pressed, false);
+    assert!(!switch.rapid_pressed);
     switch.update(147);
-    assert_eq!(switch.rapid_pressed, true);
+    assert!(switch.rapid_pressed);
     switch.update(98);
-    assert_eq!(switch.pressed, false);
+    assert!(!switch.pressed);
 }

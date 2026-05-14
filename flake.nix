@@ -18,57 +18,121 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    crane = {
-      url = "github:ipetkov/crane";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    utils.url = "github:numtide/flake-utils";
+    crane.url = "github:ipetkov/crane";
+    parts.url = "github:hercules-ci/flake-parts";
   };
 
-  outputs = { self, nixpkgs, utils, fenix, crane }:
-    with nixpkgs.lib;
-    utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = nixpkgs.legacyPackages.${system};
+  outputs =
+    inputs@{
+      self,
+      nixpkgs,
+      fenix,
+      crane,
+      parts,
+    }:
+    parts.lib.mkFlake { inherit inputs; } {
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "aarch64-darwin"
+        "x86_64-darwin"
+      ];
+      perSystem =
+        {
+          config,
+          lib,
+          self',
+          inputs',
+          pkgs,
+          system,
+          ...
+        }:
+        let
 
-        rustToolchain = with fenix.packages.${system};
-          fromToolchainFile {
-            file = ./firmware/rust-toolchain.toml;
-            hash = fakeHash;
+          toolchain =
+            with fenix.packages.${system};
+            combine [
+              stable.toolchain
+              targets.thumbv6m-none-eabi.stable.rust-std
+              targets.riscv32imac-unknown-none-elf.stable.rust-std
+            ];
+          craneLib = (crane.mkLib pkgs).overrideToolchain toolchain;
+
+          fileSetForCrate =
+            crate:
+            lib.fileset.toSource {
+              root = ./firmware;
+              fileset = lib.fileset.unions [
+                ./firmware/Cargo.toml
+                ./firmware/Cargo.lock
+                (craneLib.fileset.commonCargoSources ./firmware/library)
+                (craneLib.fileset.commonCargoSources crate)
+              ];
+            };
+        in
+        {
+          devShells.default = craneLib.devShell {
+            checks = self.checks.${system};
+
+            packages = with pkgs; [
+              probe-rs-tools
+              flip-link
+              elf2uf2-rs
+              gcc-arm-embedded
+              cargo-binutils
+            ];
           };
-
-        nativeBuildInputs = with pkgs;
-          [
-            rustToolchain
-
-            probe-rs-tools
-            flip-link
-            elf2uf2-rs
-            gcc-arm-embedded
-            cargo-binutils
-          ];
-
-        # CARGO_BUILD_TARGET = "x86_64-unknown-linux-musl";
-        # CARGO_BUILD_RUSTFLAGS = "-C target-feature=+crt-static";
-        CARGO_BUILD_TARGET = null;
-        CARGO_BUILD_RUSTFLAGS = null;
-
-        # crane setup
-        craneLib = crane.lib.${system}.overrideToolchain rustToolchain;
-        src = craneLib.cleanCargoSource ./.;
-
-        cargoArtifacts = craneLib.buildDepsOnly {
-          inherit src;
-          inherit nativeBuildInputs CARGO_BUILD_TARGET CARGO_BUILD_RUSTFLAGS;
         };
-      in {
-        packages = { };
-
-        devShells.default = pkgs.mkShell {
-          inherit nativeBuildInputs CARGO_BUILD_TARGET CARGO_BUILD_RUSTFLAGS;
-        };
-
-        formatter = pkgs.nixfmt;
-      });
+    };
+  # with nixpkgs.lib;
+  # utils.lib.eachDefaultSystem (system:
+  #   let
+  #     pkgs = nixpkgs.legacyPackages.${system};
+  #
+  #     rustToolchain = with fenix.packages.${system};
+  #       fromToolchainFile {
+  #         file = ./firmware/rust-toolchain.toml;
+  #         hash = fakeHash;
+  #       };
+  #
+  #     fileSetForCrate =
+  #       crate:
+  #       lib.fileset.toSource {
+  #         root = ./firmware;
+  #         fileset = lib.fileset.unions [
+  #           ./firmware/Cargo.toml
+  #           ./firmware/Cargo.lock
+  #           (craneLib.fileset.commonCargoSources ./firmware/library)
+  #           (craneLib.fileset.commonCargoSources crate)
+  #         ];
+  #       };
+  #
+  #     nativeBuildInputs = with pkgs;
+  #       [
+  #         rustToolchain
+  #
+  #       ];
+  #
+  #     # CARGO_BUILD_TARGET = "x86_64-unknown-linux-musl";
+  #     # CARGO_BUILD_RUSTFLAGS = "-C target-feature=+crt-static";
+  #     CARGO_BUILD_TARGET = null;
+  #     CARGO_BUILD_RUSTFLAGS = null;
+  #
+  #     # crane setup
+  #     craneLib = crane.lib.${system}.overrideToolchain rustToolchain;
+  #     src = craneLib.cleanCargoSource ./.;
+  #
+  #     cargoArtifacts = craneLib.buildDepsOnly {
+  #       inherit src;
+  #       inherit nativeBuildInputs CARGO_BUILD_TARGET CARGO_BUILD_RUSTFLAGS;
+  #     };
+  #   in {
+  #     packages = { };
+  #
+  #     devShells.default = pkgs.mkShell {
+  #       inherit nativeBuildInputs CARGO_BUILD_TARGET CARGO_BUILD_RUSTFLAGS;
+  #     };
+  #
+  #     formatter = pkgs.nixfmt;
+  #   });
 }

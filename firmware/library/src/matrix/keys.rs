@@ -122,7 +122,7 @@ impl Keymap {
         unsafe {
             for check_layer in (0..(KEYMAP.active_layer + 1)).rev() {
                 debug!("layer: {:?}", check_layer);
-                match &mut KEYMAP.layers[(check_layer)][key] {
+                match &mut KEYMAP.layers[check_layer][key] {
                     Key::Keycode(keycode) => {
                         Keymap::set_keycode(state, *keycode);
                         return;
@@ -172,7 +172,7 @@ impl Keymap {
         debug!("hold: {:?} {:?}", key, state);
         unsafe {
             for check_layer in (0..(KEYMAP.active_layer + 1)).rev() {
-                match &mut KEYMAP.layers[(check_layer)][key] {
+                match &mut KEYMAP.layers[check_layer][key] {
                     Key::LayerTap(layer, _) => Keymap::set_layer(state, *layer),
                     Key::KeyTap(keycode, _) => Keymap::set_keycode(state, *keycode),
                     _ => continue,

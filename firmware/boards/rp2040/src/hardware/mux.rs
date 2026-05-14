@@ -1,5 +1,4 @@
-use core::fmt::Debug;
-use embedded_hal::digital::v2::OutputPin;
+use embedded_hal::digital::OutputPin;
 
 pub struct CD74HC4067<A, B, C, D> {
     pin_0: A,
@@ -14,10 +13,6 @@ where
     B: OutputPin,
     C: OutputPin,
     D: OutputPin,
-    <A as OutputPin>::Error: Debug,
-    <B as OutputPin>::Error: Debug,
-    <C as OutputPin>::Error: Debug,
-    <D as OutputPin>::Error: Debug,
 {
     pub fn new(mut pin_0: A, mut pin_1: B, mut pin_2: C, mut pin_3: D) -> Self {
         // Set to output 0

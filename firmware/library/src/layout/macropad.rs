@@ -1,5 +1,3 @@
-use super::{keymap, layer, switches};
-
 /// Number of multiplexers connected to ADC
 pub const NUM_MUX: usize = 1;
 /// Total number of switches

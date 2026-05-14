@@ -1,9 +1,13 @@
+use cortex_m::prelude::*;
+
 use defmt::{debug, info};
+
 use usb_device::class_prelude::*;
 use usb_device::prelude::*;
+use usbd_human_interface_device::device::DeviceClass;
+use usbd_human_interface_device::device::keyboard::NKROBootKeyboardConfig;
 use usbd_human_interface_device::prelude::*;
 
-use embedded_hal::prelude::*;
 use fugit::ExtU32;
 
 use crate::hal::Timer;
@@ -14,17 +18,16 @@ where
     U: UsbBus + Sized,
 {
     let mut keyboard = UsbHidClassBuilder::new()
-        .add_interface(
-            usbd_human_interface_device::device::keyboard::NKROBootKeyboardInterface::default_config(),
-        )
+        .add_device(NKROBootKeyboardConfig::default())
         .build(&usb_bus);
 
     //https://pid.codes
     let mut usb_dev = UsbDeviceBuilder::new(&usb_bus, UsbVidPid(0x1209, 0x0001))
-        .manufacturer("usbd-human-interface-device")
-        .product("NKRO Keyboard")
-        .serial_number("TEST")
-        .max_packet_size_0(8)
+        .strings(&[StringDescriptors::default()
+            .manufacturer("usbd-human-interface-device")
+            .product("NKRO Keyboard")
+            .serial_number("TEST")])
+        .unwrap()
         .build();
 
     let mut tick_count_down = timer.count_down();
@@ -35,7 +38,7 @@ where
         if tick_count_down.wait().is_ok() {
             let keys = matrix::Keymap::keyboard();
 
-            match keyboard.interface().write_report(keys) {
+            match keyboard.device().write_report(keys) {
                 Err(UsbHidError::WouldBlock) => {}
                 Err(UsbHidError::Duplicate) => {}
                 Ok(_) => {}
@@ -44,7 +47,7 @@ where
                 }
             };
 
-            match keyboard.interface().tick() {
+            match keyboard.device().tick() {
                 Err(UsbHidError::WouldBlock) => {}
                 Ok(_) => {}
                 Err(e) => {
@@ -56,7 +59,7 @@ where
         }
 
         if usb_dev.poll(&mut [&mut keyboard]) {
-            match keyboard.interface().read_report() {
+            match keyboard.device().read_report() {
                 Err(UsbError::WouldBlock) => {
                     //do nothing
                 }
