@@ -3,20 +3,20 @@
 *.log
 tmp/
 
-/firmware/target
-/firmware/board/target
+/target
+/board/target
 /result
 /.direnv
 
-/macropad/macropad-backups/
-/macropad/production
-/macropad/output
-/macropad/bom
+/hardware/macropad/macropad-backups/
+/hardware/macropad/production
+/hardware/macropad/output
+/hardware/macropad/bom
 
-/woodox/woodox-backups/
-/woodox/production
-/woodox/output
-/woodox/bom
+/hardware/woodox/woodox-backups/
+/hardware/woodox/production
+/hardware/woodox/output
+/hardware/woodox/bom
 
 *.lck
 
