@@ -1,6 +1,6 @@
 [package]
 edition = "2024"
-name = "protodox"
+name = "woodox"
 version = "0.1.0"
 
 [dependencies]
@@ -8,8 +8,10 @@ woodox-lib = { path = "../../library" }
 
 cortex-m = "0.7"
 cortex-m-rt = "0.7"
+cortex-m-rtic = "1"
 embedded-hal = "1"
 embedded-time = "0.12"
+critical-section = "1"
 
 defmt = "1"
 defmt-rtt = "1"
@@ -20,24 +22,17 @@ usb-device = "0"
 fugit = "0.3.9"
 packed_struct = { version = "0", default-features = false }
 
-# but you can use any BSP. Uncomment this to use the pro_micro_rp2040 BSP instead
-# sparkfun-pro-micro-rp2040 = "0.3"
+rp235x-hal = { version="0.4", features = ["binary-info", "critical-section-impl", "rt", "defmt"] }
 
-rp2040-hal = { version="0.12", features=["rt", "critical-section-impl"] }
-rp2040-boot2 = "0.3"
-
-ws2812-pio = "0.9"
-smart-leds = "0.4"
-
-critical-section = "1"
+# ws2812-pio = "0.9"
+# smart-leds = "0.4"
 
 [dev-dependencies]
 embedded-hal-mock = "0.11"
 
 [features]
-default = ["macropad"]
+default = []
 
 # Timer to gather some benchmarks during runtime
 timers = []
 
-macropad = []
