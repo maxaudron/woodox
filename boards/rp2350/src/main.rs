@@ -1,9 +1,9 @@
 #![no_std]
 #![no_main]
 
-use rp235x_hal as hal;
 use hal::multicore::Multicore;
 use hal::multicore::Stack;
+use rp235x_hal as hal;
 
 use usb_device::class_prelude::*;
 
@@ -73,29 +73,30 @@ fn main() -> ! {
     // Setup Mux and ADC for switch scanning
 
     // Initialize MUX
-    let mux = hardware::CD74HC4067::new(
+    let mux = hardware::CD74HC4051::new(
         pins.mux1_s0.into_push_pull_output(),
         pins.mux1_s1.into_push_pull_output(),
         pins.mux1_s2.into_push_pull_output(),
-        pins.mux1_s3.into_push_pull_output(),
     );
 
     // Initialize ADC
     let adc = {
         let adc = Adc::new(pac.ADC, &mut pac.RESETS);
-        let _adc_pin_0 = pins.mux1_com.into_floating_input();
-        let _adc_pin_1 = pins.mux2_com.into_floating_input();
-        let _adc_pin_2 = pins.mux3_com.into_floating_input();
-        let _adc_pin_3 = pins.mux4_com.into_floating_input();
+        let adc_pin_0 = pins.mux1_com.into_floating_input();
+        let adc_pin_1 = pins.mux2_com.into_floating_input();
+        let adc_pin_2 = pins.mux3_com.into_floating_input();
+        let adc_pin_3 = pins.mux4_com.into_floating_input();
 
-        let adc = adc.free();
-        adc.cs().modify(|_, w| unsafe { w.rrobin().bits(0b01111) });
-
-        adc.cs().modify(|_, w| unsafe { w.ainsel().bits(0) });
-        adc.cs().modify(|_, w| w.en().set_bit());
-        while !adc.cs().read().ready().bit_is_set() {
-            cortex_m::asm::nop();
-        }
+        let fifo = adc
+            .build_fifo()
+            .round_robin((
+                &mut adc_pin_0,
+                &mut adc_pin_1,
+                &mut adc_pin_2,
+                &mut adc_pin_3,
+            ))
+            .set_channel(&mut adc_pin_0)
+            .start_paused();
 
         info!("adc initialization finished");
 
@@ -125,21 +126,23 @@ fn main() -> ! {
 }
 
 hal::bsp_pins!(
-    Gpio0 { name: pull_up },
-    Gpio1 { name: mux1_s3 },
-    Gpio2 { name: mux1_s2 },
-    Gpio3 { name: mux1_s1 },
-    Gpio4 { name: mux1_s0 },
-    Gpio5 { name: led },
-    Gpio26 { name: mux1_com },
-    Gpio27 { name: mux2_com },
-    Gpio28 { name: mux3_com },
-    Gpio29 { name: mux4_com },
-    // Gpio9 { name: d_cs },
-    Gpio10 { name: d_dc },
-    Gpio11 { name: d_rst },
-    Gpio12 { name: d_sda },
-    Gpio13 { name: d_scl },
+    Gpio31 { name: mux1_s0 },
+    Gpio30 { name: mux1_s1 },
+    Gpio29 { name: mux1_s2 },
+    Gpio33 { name: led },
+    Gpio44 { name: mux1_com },
+    Gpio43 { name: mux2_com },
+    Gpio42 { name: mux3_com },
+    Gpio41 { name: mux4_com },
+    Gpio34 { name: d_cs },
+    Gpio35 { name: d_dc },
+    Gpio36 { name: d_rst },
+    Gpio37 { name: d_sda },
+    Gpio38 { name: d_scl },
+    Gpio4 { name: i2c_sda },
+    Gpio5 { name: i2c_sdl },
+    Gpio6 { name: i2c_sda_acc },
+    Gpio7 { name: i2c_sdl_acc },
 );
 
 /// Program metadata for `picotool info`

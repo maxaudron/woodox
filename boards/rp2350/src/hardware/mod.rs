@@ -1,5 +1,7 @@
 mod adc;
-mod mux;
+mod cd74hc4067;
+mod cd74hc4051;
 
 pub use adc::*;
-pub use mux::*;
+pub use cd74hc4067::*;
+pub use cd74hc4051::*;

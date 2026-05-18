@@ -1,4 +1,4 @@
 [toolchain]
 channel = "stable"
-targets = ["thumbv6m-none-eabi", "riscv32imac-unknown-none-elf"]
+targets = ["thumbv6m-none-eabi", "thumbv8m.main-none-eabihf", "riscv32imac-unknown-none-elf"]
 profile = "complete"

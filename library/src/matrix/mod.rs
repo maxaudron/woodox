@@ -8,9 +8,9 @@ mod hall;
 mod keys;
 mod switch;
 
+pub use hall::*;
 pub use keys::*;
 pub use switch::*;
-pub use hall::*;
 
 /// A Single scan action to be taken on multiple switches
 ///
