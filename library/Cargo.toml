@@ -12,6 +12,7 @@ packed_struct = { version = "0", default-features = false }
 embedded-hal-mock = "0.11"
 
 [features]
-default = ["macropad"]
+default = ["woodox"]
 
 macropad = []
+woodox = []

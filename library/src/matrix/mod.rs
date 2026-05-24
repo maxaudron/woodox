@@ -39,21 +39,18 @@ impl Scan {
 /// [`Layer`]: crate::matrix::Layer
 #[derive(Default, Debug, Format, Copy, Clone)]
 pub struct ScanOrder {
-    pub scans: [Scan; NUM_SCANS],
+    pub scans: [Scan; NUM_CHANNELS],
 }
 
 impl ScanOrder {
     /// Order the user representation of the keyboard layout for runtime.
     pub fn new(switches: [Switch; NUM_SWITCHES]) -> Self {
-        let mut scans = [Scan::default(); NUM_SCANS];
+        let mut scans = [Scan::default(); NUM_CHANNELS];
 
-        switches
-            .into_iter()
-            .enumerate()
-            .for_each(|(i, mut switch)| {
-                switch.index = i;
-                scans[switch.channel as usize].switches[switch.mux as usize] = switch
-            });
+        switches.into_iter().enumerate().for_each(|(i, mut switch)| {
+            switch.index = i;
+            scans[switch.channel as usize].switches[switch.mux as usize] = switch
+        });
 
         ScanOrder { scans }
     }

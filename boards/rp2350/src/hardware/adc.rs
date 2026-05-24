@@ -1,11 +1,11 @@
-use crate::{hal::pac::ADC, layout::*};
+use crate::{hal::Adc, layout::*};
 
 pub trait ReadAdc {
     fn read(&self, pin: u8) -> u8;
     fn read_all(&self) -> [u8; NUM_MUX];
 }
 
-impl ReadAdc for ADC {
+impl ReadAdc for Adc {
     fn read(&self, channel: u8) -> u8 {
         self.cs()
             .modify(|_, w| unsafe { w.ainsel().bits(channel).start_once().set_bit() });

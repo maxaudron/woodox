@@ -11,14 +11,14 @@ pub const NUM_SWITCHES: usize = 8;
 /// Thus this default is usually correct, this still needs to be copied
 /// into every layout as there is no way to conditionally set a const at
 /// compile time if it is unset.
-pub const NUM_SCANS: usize = NUM_SWITCHES / NUM_MUX;
+pub const NUM_CHANNELS: usize = NUM_SWITCHES / NUM_MUX;
 
 /// About 200ms for this board
 pub const HOLD_TIME: u32 = 8000;
 
 switches! {
-    0,1, 0,3, 0,5, 0,7,
-    0,0, 0,2, 0,4, 0,6,
+    0;1, 0;3, 0;5, 0;7,
+    0;0, 0;2, 0;4, 0;6,
 }
 
 keymap! {

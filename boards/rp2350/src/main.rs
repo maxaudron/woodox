@@ -3,6 +3,7 @@
 
 use hal::multicore::Multicore;
 use hal::multicore::Stack;
+use rp235x_hal::dma::DMAExt;
 use rp235x_hal as hal;
 
 use usb_device::class_prelude::*;
@@ -13,13 +14,15 @@ use defmt_rtt as _;
 #[cfg(all(target_arch = "arm", target_os = "none"))]
 use panic_probe as _;
 
-use hal::{Adc, clocks, entry, pac, watchdog};
+use hal::{Adc, adc::AdcPin, clocks, entry, pac, watchdog};
 
 mod hardware;
 mod scan;
 mod usb;
 
 use woodox_lib::layout;
+
+use crate::scan::ScanState;
 
 /// Tell the Boot ROM about our application
 #[unsafe(link_section = ".start_block")]
@@ -60,12 +63,7 @@ fn main() -> ! {
     let test = "whatever";
     let timer = hal::Timer::new_timer0(pac.TIMER0, &mut pac.RESETS, &clocks);
 
-    let pins = Pins::new(
-        pac.IO_BANK0,
-        pac.PADS_BANK0,
-        sio.gpio_bank0,
-        &mut pac.RESETS,
-    );
+    let pins = Pins::new(pac.IO_BANK0, pac.PADS_BANK0, sio.gpio_bank0, &mut pac.RESETS);
 
     info!("core initialization finished");
 
@@ -73,35 +71,35 @@ fn main() -> ! {
     // Setup Mux and ADC for switch scanning
 
     // Initialize MUX
-    let mux = hardware::CD74HC4051::new(
+    let mux = hardware::mux::CD74HC4051::new(
         pins.mux1_s0.into_push_pull_output(),
         pins.mux1_s1.into_push_pull_output(),
         pins.mux1_s2.into_push_pull_output(),
     );
 
+    let dma = pac.DMA.split(&mut pac.RESETS);
+
     // Initialize ADC
     let adc = {
-        let adc = Adc::new(pac.ADC, &mut pac.RESETS);
-        let adc_pin_0 = pins.mux1_com.into_floating_input();
-        let adc_pin_1 = pins.mux2_com.into_floating_input();
-        let adc_pin_2 = pins.mux3_com.into_floating_input();
-        let adc_pin_3 = pins.mux4_com.into_floating_input();
+        let mut adc = Adc::new(pac.ADC, &mut pac.RESETS);
+        let mut adc_pin_0 = AdcPin::new(pins.mux1_com.into_floating_input()).unwrap();
+        let adc_pin_1 = AdcPin::new(pins.mux2_com.into_floating_input()).unwrap();
+        let adc_pin_2 = AdcPin::new(pins.mux3_com.into_floating_input()).unwrap();
+        let adc_pin_3 = AdcPin::new(pins.mux4_com.into_floating_input()).unwrap();
 
         let fifo = adc
             .build_fifo()
-            .round_robin((
-                &mut adc_pin_0,
-                &mut adc_pin_1,
-                &mut adc_pin_2,
-                &mut adc_pin_3,
-            ))
+            .round_robin((&adc_pin_0, &adc_pin_1, &adc_pin_2, &adc_pin_3))
             .set_channel(&mut adc_pin_0)
+            .enable_dma()
             .start_paused();
 
         info!("adc initialization finished");
 
-        adc
+        fifo
     };
+    
+    let scan = ScanState::new(mux, dma, adc);
 
     // ------------------------------------
     // Setup USB BUS

@@ -2,7 +2,7 @@
 
 #[macro_export]
 macro_rules! switches {
-    {$($x:expr,$y:expr),+$(,)+} => {
+    {$($x:expr;$y:expr),+$(,)+} => {
         use $crate::matrix::Switch;
 
         pub fn default_switches() -> [Switch; NUM_SWITCHES] {
@@ -62,3 +62,8 @@ pub use {keymap, layer, switches};
 mod macropad;
 #[cfg(feature = "macropad")]
 pub use macropad::*;
+
+#[cfg(feature = "woodox")]
+mod woodox;
+#[cfg(feature = "woodox")]
+pub use woodox::*;
