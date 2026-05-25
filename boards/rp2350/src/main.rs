@@ -27,13 +27,15 @@ mod app {
         hal::{
             self, Adc,
             adc::AdcPin,
-            dma::{DMAExt},
+            dma::DMAExt,
+            timer::{Alarm, Alarm0, CopyableTimer0},
             usb::UsbBus,
         },
         scan::ScanState,
         usb::Usb,
     };
     use defmt::info;
+    use fugit::MicrosDurationU32;
     use usb_device::bus::UsbBusAllocator;
 
     #[shared]
@@ -42,12 +44,17 @@ mod app {
         scan: ScanState<'static>,
         #[lock_free]
         usb: Usb<UsbBus>,
+        #[lock_free]
+        alarm: Alarm0<CopyableTimer0>,
     }
 
     #[local]
     struct Local {}
 
-    #[init(local = [adc: Option<hal::Adc> = None, usb: Option<UsbBusAllocator<UsbBus>> = None])]
+    #[init(local = [
+        adc: Option<hal::Adc> = None, 
+        usb: Option<UsbBusAllocator<UsbBus>> = None,
+    ])]
     fn init(c: init::Context) -> (Shared, Local) {
         info!("program start");
         // ------------------------------------
@@ -69,7 +76,7 @@ mod app {
         .ok()
         .unwrap();
 
-        let timer = hal::Timer::new_timer0(pac.TIMER0, &mut pac.RESETS, &clocks);
+        let mut timer = hal::Timer::new_timer0(pac.TIMER0, &mut pac.RESETS, &clocks);
 
         let pins = Pins::new(pac.IO_BANK0, pac.PADS_BANK0, sio.gpio_bank0, &mut pac.RESETS);
 
@@ -117,12 +124,25 @@ mod app {
         let usb_bus = c.local.usb.as_mut().unwrap();
         let usb = Usb::new(usb_bus);
 
-        (Shared { scan, usb }, Local {})
+        let mut alarm = timer.alarm_0().unwrap();
+        alarm.enable_interrupt();
+        alarm.schedule(MicrosDurationU32::Hz(1000)).unwrap();
+
+        (Shared { scan, usb, alarm }, Local {})
     }
 
-    #[task(binds = TIMER0_IRQ_0, shared = [scan, usb])]
+    #[task(binds = TIMER0_IRQ_0, shared = [scan, usb, alarm])]
     fn usb_timer_alarm(cx: usb_timer_alarm::Context) {
+        // Schedule next USB interrupt instantly
+        cx.shared.alarm.clear_interrupt();
+        cx.shared.alarm.schedule(MicrosDurationU32::Hz(1000)).unwrap();
+        
+        // Do our matrix scan & usb report
+        // this should be fixed timing smaller than the USB timer period
+        // so complete before the next IRQ
         cx.shared.usb.tick();
+        cx.shared.scan.scan();
+
     }
 
     #[task(binds = DMA_IRQ_0, shared = [scan])]

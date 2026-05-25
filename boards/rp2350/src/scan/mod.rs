@@ -1,4 +1,4 @@
-use defmt::debug;
+use defmt::{debug, info};
 
 use woodox_lib::{layout::default_switches, matrix::ScanOrder};
 
@@ -54,10 +54,15 @@ impl<'a> ScanState<'a> {
         }
     }
 
-    pub fn init(&mut self) {}
+    pub fn scan(&mut self) {
+        info!("initiated new full matrix scan");
+        self.channel = 0;
+        self.dma_completion();
+    }
 
     /// Triggered by DMA_IRQ_0 interrupt
     pub fn dma_completion(&mut self) {
+        debug!("completed dma transfer for channel: {}", self.channel);
         self.fifo.pause();
         let transfer = self.transfer.take().unwrap();
 
@@ -73,18 +78,19 @@ impl<'a> ScanState<'a> {
             .map(|s| s / NUM_MUX as u8);
 
         self.scan.scans[self.channel as usize].update(res);
+        debug!("completed update for channel: {}", self.channel);
 
         self.dma = Some(ch);
         self.buf = Some(buf);
 
         if self.channel < NUM_CHANNELS as u8 {
             self.channel += 1;
-            self.scan();
+            self.scan_one();
         }
     }
 
     /// Switch the active mux input and initiate the adc dma transfer
-    pub fn scan(&mut self) {
+    fn scan_one(&mut self) {
         self.mux.set_output_active(self.channel);
         self.fifo.clear();
 
@@ -92,7 +98,7 @@ impl<'a> ScanState<'a> {
         let dma = self.dma.take().unwrap();
         self.transfer = Some(single_buffer::Config::new(dma, self.fifo.dma_read_target(), buf).start());
         self.fifo.resume();
-        debug!("resumed adc dma transfer");
+        debug!("resumed adc dma transfer for channel: {}", self.channel);
     }
 }
 
