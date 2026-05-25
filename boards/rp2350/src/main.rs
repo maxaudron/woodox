@@ -1,28 +1,15 @@
 #![no_std]
 #![no_main]
 
-use hal::multicore::Multicore;
-use hal::multicore::Stack;
-use rp235x_hal::dma::DMAExt;
-use rp235x_hal as hal;
-
-use usb_device::class_prelude::*;
-
-use defmt::*;
 use defmt_rtt as _;
+use rp235x_hal as hal;
 
 #[cfg(all(target_arch = "arm", target_os = "none"))]
 use panic_probe as _;
 
-use hal::{Adc, adc::AdcPin, clocks, entry, pac, watchdog};
-
 mod hardware;
 mod scan;
 mod usb;
-
-use woodox_lib::layout;
-
-use crate::scan::ScanState;
 
 /// Tell the Boot ROM about our application
 #[unsafe(link_section = ".start_block")]
@@ -33,55 +20,76 @@ pub static IMAGE_DEF: hal::block::ImageDef = hal::block::ImageDef::secure_exe();
 /// Adjust if your board has a different frequency
 const XTAL_FREQ_HZ: u32 = 12_000_000u32;
 
-pub const DMA_BUF_SIZE: usize = 4;
+#[rtic::app(device = crate::hal::pac)]
+mod app {
+    use crate::{
+        Pins,
+        hal::{
+            self, Adc,
+            adc::AdcPin,
+            dma::{DMAExt},
+            usb::UsbBus,
+        },
+        scan::ScanState,
+        usb::Usb,
+    };
+    use defmt::info;
+    use usb_device::bus::UsbBusAllocator;
 
-static CORE1_STACK: Stack<4096> = Stack::new();
+    #[shared]
+    struct Shared {
+        #[lock_free]
+        scan: ScanState<'static>,
+        #[lock_free]
+        usb: Usb<UsbBus>,
+    }
 
-#[entry]
-fn main() -> ! {
-    info!("program start");
+    #[local]
+    struct Local {}
 
-    // ------------------------------------
-    // Setup core hardware
-    let mut pac = pac::Peripherals::take().unwrap();
-    let mut watchdog = watchdog::Watchdog::new(pac.WATCHDOG);
-    let mut sio = hal::Sio::new(pac.SIO);
+    #[init(local = [adc: Option<hal::Adc> = None, usb: Option<UsbBusAllocator<UsbBus>> = None])]
+    fn init(c: init::Context) -> (Shared, Local) {
+        info!("program start");
+        // ------------------------------------
+        // Setup core hardware
+        let mut pac = hal::pac::Peripherals::take().unwrap();
+        let mut watchdog = hal::watchdog::Watchdog::new(pac.WATCHDOG);
+        let sio = hal::Sio::new(pac.SIO);
 
-    // External high-speed crystal on the pico board is 12Mhz
-    let clocks = clocks::init_clocks_and_plls(
-        XTAL_FREQ_HZ,
-        pac.XOSC,
-        pac.CLOCKS,
-        pac.PLL_SYS,
-        pac.PLL_USB,
-        &mut pac.RESETS,
-        &mut watchdog,
-    )
-    .ok()
-    .unwrap();
+        // External high-speed crystal on the pico board is 12Mhz
+        let clocks = hal::clocks::init_clocks_and_plls(
+            crate::XTAL_FREQ_HZ,
+            pac.XOSC,
+            pac.CLOCKS,
+            pac.PLL_SYS,
+            pac.PLL_USB,
+            &mut pac.RESETS,
+            &mut watchdog,
+        )
+        .ok()
+        .unwrap();
 
-    let test = "whatever";
-    let timer = hal::Timer::new_timer0(pac.TIMER0, &mut pac.RESETS, &clocks);
+        let timer = hal::Timer::new_timer0(pac.TIMER0, &mut pac.RESETS, &clocks);
 
-    let pins = Pins::new(pac.IO_BANK0, pac.PADS_BANK0, sio.gpio_bank0, &mut pac.RESETS);
+        let pins = Pins::new(pac.IO_BANK0, pac.PADS_BANK0, sio.gpio_bank0, &mut pac.RESETS);
 
-    info!("core initialization finished");
+        info!("core initialization finished");
 
-    // ------------------------------------
-    // Setup Mux and ADC for switch scanning
+        // ------------------------------------
+        // Setup Mux and ADC for switch scanning
 
-    // Initialize MUX
-    let mux = hardware::mux::CD74HC4051::new(
-        pins.mux1_s0.into_push_pull_output(),
-        pins.mux1_s1.into_push_pull_output(),
-        pins.mux1_s2.into_push_pull_output(),
-    );
+        // Initialize MUX
 
-    let dma = pac.DMA.split(&mut pac.RESETS);
+        let mux = crate::hardware::mux::CD74HC4051::new(
+            pins.mux1_s0.into_push_pull_output(),
+            pins.mux1_s1.into_push_pull_output(),
+            pins.mux1_s2.into_push_pull_output(),
+        );
 
-    // Initialize ADC
-    let adc = {
-        let mut adc = Adc::new(pac.ADC, &mut pac.RESETS);
+        let dma = pac.DMA.split(&mut pac.RESETS);
+        *c.local.adc = Some(Adc::new(pac.ADC, &mut pac.RESETS));
+        let adc = c.local.adc.as_mut().unwrap();
+
         let mut adc_pin_0 = AdcPin::new(pins.mux1_com.into_floating_input()).unwrap();
         let adc_pin_1 = AdcPin::new(pins.mux2_com.into_floating_input()).unwrap();
         let adc_pin_2 = AdcPin::new(pins.mux3_com.into_floating_input()).unwrap();
@@ -91,36 +99,37 @@ fn main() -> ! {
             .build_fifo()
             .round_robin((&adc_pin_0, &adc_pin_1, &adc_pin_2, &adc_pin_3))
             .set_channel(&mut adc_pin_0)
+            .shift_8bit()
             .enable_dma()
             .start_paused();
+        let scan = ScanState::new(mux, dma.ch0, fifo);
 
         info!("adc initialization finished");
 
-        fifo
-    };
-    
-    let scan = ScanState::new(mux, dma, adc);
+        *c.local.usb = Some(UsbBusAllocator::new(hal::usb::UsbBus::new(
+            pac.USB,
+            pac.USB_DPRAM,
+            clocks.usb_clock,
+            true,
+            &mut pac.RESETS,
+        )));
 
-    // ------------------------------------
-    // Setup USB BUS
-    let usb_bus = UsbBusAllocator::new(hal::usb::UsbBus::new(
-        pac.USB,
-        pac.USB_DPRAM,
-        clocks.usb_clock,
-        true,
-        &mut pac.RESETS,
-    ));
+        let usb_bus = c.local.usb.as_mut().unwrap();
+        let usb = Usb::new(usb_bus);
 
-    // ------------------------------------
-    // Start switch scan loop on core 1
-    let mut mc = Multicore::new(&mut pac.PSM, &mut pac.PPB, &mut sio.fifo);
-    let cores = mc.cores();
-    let core1 = &mut cores[1];
-    let _scan = core1.spawn(CORE1_STACK.take().unwrap(), || scan::scan(adc, mux));
+        (Shared { scan, usb }, Local {})
+    }
 
-    // ------------------------------------
-    // Start usb controlelr loop on core 0
-    usb::usb::<hal::usb::UsbBus>(timer, usb_bus)
+    #[task(binds = TIMER0_IRQ_0, shared = [scan, usb])]
+    fn usb_timer_alarm(cx: usb_timer_alarm::Context) {
+        cx.shared.usb.tick();
+    }
+
+    #[task(binds = DMA_IRQ_0, shared = [scan])]
+    fn scan_dma_completion(cx: scan_dma_completion::Context) {
+        let scan = cx.shared.scan;
+        scan.dma_completion();
+    }
 }
 
 hal::bsp_pins!(

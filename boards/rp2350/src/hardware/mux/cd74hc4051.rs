@@ -1,6 +1,14 @@
+use crate::hal::gpio::{
+    FunctionSio, Pin, PullDown, SioOutput,
+    bank0::{Gpio29, Gpio30, Gpio31},
+};
 use embedded_hal::digital::OutputPin;
 
 use crate::hardware::mux::Mux;
+
+pub type MuxPin1 = Pin<Gpio31, FunctionSio<SioOutput>, PullDown>;
+pub type MuxPin2 = Pin<Gpio30, FunctionSio<SioOutput>, PullDown>;
+pub type MuxPin3 = Pin<Gpio29, FunctionSio<SioOutput>, PullDown>;
 
 pub struct CD74HC4051<A, B, C> {
     pin_0: A,

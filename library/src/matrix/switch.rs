@@ -75,11 +75,23 @@ impl Switch {
     ///
     /// `mux` is the id of the ADC pin the multiplexer is attached to.
     /// `channel` is the channel of the multiplexer this switch is attached to.
-    pub fn new(mux: u8, channel: u8) -> Self {
+    pub const fn new(mux: u8, channel: u8) -> Self {
         Self {
             mux,
             channel,
-            ..Default::default()
+            position: 0,
+            pressed: false,
+            trig_lower: 0,
+            trig_upper: 0,
+            rapid_enabled: false,
+            rapid_pressed: false,
+            rapid_position: 0,
+            rapid_lower: 0,
+            rapid_upper: 0,
+            comp: 0,
+            index: 0,
+            hold_counter: 0,
+            held: false,
         }
     }
 

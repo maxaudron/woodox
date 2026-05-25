@@ -6,10 +6,9 @@ version = "0.1.0"
 [dependencies]
 woodox-lib = { path = "../../library" }
 
-rtic = "2"
+rtic = { version = "2", features = ["thumbv8main-backend"] }
 cortex-m = "0.7"
 cortex-m-rt = "0.7"
-cortex-m-rtic = "1"
 embedded-hal = "1"
 embedded-time = "0.12"
 critical-section = "1"
@@ -21,6 +20,7 @@ panic-probe = { version = "1", features = ["print-defmt"] }
 usbd-human-interface-device = "0.6"
 usb-device = "0"
 fugit = "0.3.9"
+frunk_core = { version = "0.4", default-features = false }
 packed_struct = { version = "0", default-features = false }
 
 rp235x-hal = { version="0.4", features = ["binary-info", "critical-section-impl", "rt", "defmt"] }

@@ -16,6 +16,8 @@ pub const NUM_CHANNELS: usize = NUM_SWITCHES / NUM_MUX;
 /// About 200ms for this board
 pub const HOLD_TIME: u32 = 8000;
 
+pub const SAMPLES: usize = 4;
+
 switches! {
     0;1, 0;0, 0;5, 0;7, 0;6, 0;4,
     1;1, 1;0, 1;5, 1;7, 1;6, 1;4,

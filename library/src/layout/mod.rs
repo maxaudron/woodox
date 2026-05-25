@@ -5,7 +5,7 @@ macro_rules! switches {
     {$($x:expr;$y:expr),+$(,)+} => {
         use $crate::matrix::Switch;
 
-        pub fn default_switches() -> [Switch; NUM_SWITCHES] {
+        pub const fn default_switches() -> [Switch; NUM_SWITCHES] {
             [ $(Switch::new($x,$y)),+ ]
         }
     };

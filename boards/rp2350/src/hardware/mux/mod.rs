@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 mod cd74hc4051;
 mod cd74hc4067;
 

@@ -22,6 +22,12 @@ pub struct Scan {
 }
 
 impl Scan {
+    pub const fn new() -> Self {
+        Scan {
+            switches: [Switch::new(0, 0); NUM_MUX],
+        }
+    }
+
     pub fn update(&mut self, values: [u8; NUM_MUX]) {
         self.switches
             .iter_mut()
@@ -45,7 +51,7 @@ pub struct ScanOrder {
 impl ScanOrder {
     /// Order the user representation of the keyboard layout for runtime.
     pub fn new(switches: [Switch; NUM_SWITCHES]) -> Self {
-        let mut scans = [Scan::default(); NUM_CHANNELS];
+        let mut scans = [Scan::new(); NUM_CHANNELS];
 
         switches.into_iter().enumerate().for_each(|(i, mut switch)| {
             switch.index = i;
