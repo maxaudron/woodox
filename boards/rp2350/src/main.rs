@@ -1,11 +1,11 @@
 #![no_std]
 #![no_main]
 
-use defmt_rtt as _;
 use rp235x_hal as hal;
 
 #[cfg(all(target_arch = "arm", target_os = "none"))]
 use panic_probe as _;
+use defmt_rtt as _;
 
 mod hardware;
 mod scan;
@@ -37,9 +37,12 @@ mod app {
     use defmt::info;
     use fugit::MicrosDurationU32;
     use usb_device::bus::UsbBusAllocator;
+    use woodox_lib::matrix::KeyboardState;
 
     #[shared]
     struct Shared {
+        #[lock_free]
+        keys: KeyboardState,
         #[lock_free]
         scan: ScanState<'static>,
         #[lock_free]
@@ -57,28 +60,34 @@ mod app {
     ])]
     fn init(c: init::Context) -> (Shared, Local) {
         info!("program start");
+
+        unsafe {
+            hal::sio::spinlock_reset();
+        }
+
         // ------------------------------------
         // Setup core hardware
-        let mut pac = hal::pac::Peripherals::take().unwrap();
-        let mut watchdog = hal::watchdog::Watchdog::new(pac.WATCHDOG);
-        let sio = hal::Sio::new(pac.SIO);
+        
+        let mut resets = c.device.RESETS;
+        let mut watchdog = hal::watchdog::Watchdog::new(c.device.WATCHDOG);
+        let sio = hal::Sio::new(c.device.SIO);
 
         // External high-speed crystal on the pico board is 12Mhz
         let clocks = hal::clocks::init_clocks_and_plls(
             crate::XTAL_FREQ_HZ,
-            pac.XOSC,
-            pac.CLOCKS,
-            pac.PLL_SYS,
-            pac.PLL_USB,
-            &mut pac.RESETS,
+            c.device.XOSC,
+            c.device.CLOCKS,
+            c.device.PLL_SYS,
+            c.device.PLL_USB,
+            &mut resets,
             &mut watchdog,
         )
         .ok()
         .unwrap();
 
-        let mut timer = hal::Timer::new_timer0(pac.TIMER0, &mut pac.RESETS, &clocks);
+        let mut timer = hal::Timer::new_timer0(c.device.TIMER0, &mut resets, &clocks);
 
-        let pins = Pins::new(pac.IO_BANK0, pac.PADS_BANK0, sio.gpio_bank0, &mut pac.RESETS);
+        let pins = Pins::new(c.device.IO_BANK0, c.device.PADS_BANK0, sio.gpio_bank0, &mut resets);
 
         info!("core initialization finished");
 
@@ -93,8 +102,8 @@ mod app {
             pins.mux1_s2.into_push_pull_output(),
         );
 
-        let dma = pac.DMA.split(&mut pac.RESETS);
-        *c.local.adc = Some(Adc::new(pac.ADC, &mut pac.RESETS));
+        let dma = c.device.DMA.split(&mut resets);
+        *c.local.adc = Some(Adc::new(c.device.ADC, &mut resets));
         let adc = c.local.adc.as_mut().unwrap();
 
         let mut adc_pin_0 = AdcPin::new(pins.mux1_com.into_floating_input()).unwrap();
@@ -114,11 +123,11 @@ mod app {
         info!("adc initialization finished");
 
         *c.local.usb = Some(UsbBusAllocator::new(hal::usb::UsbBus::new(
-            pac.USB,
-            pac.USB_DPRAM,
+            c.device.USB,
+            c.device.USB_DPRAM,
             clocks.usb_clock,
             true,
-            &mut pac.RESETS,
+            &mut resets,
         )));
 
         let usb_bus = c.local.usb.as_mut().unwrap();
@@ -128,10 +137,12 @@ mod app {
         alarm.enable_interrupt();
         alarm.schedule(MicrosDurationU32::Hz(1000)).unwrap();
 
-        (Shared { scan, usb, alarm }, Local {})
+        let keys = KeyboardState::new();
+
+        (Shared { keys, scan, usb, alarm }, Local {})
     }
 
-    #[task(binds = TIMER0_IRQ_0, shared = [scan, usb, alarm])]
+    #[task(binds = TIMER0_IRQ_0, shared = [keys, scan, usb, alarm])]
     fn usb_timer_alarm(cx: usb_timer_alarm::Context) {
         // Schedule next USB interrupt instantly
         cx.shared.alarm.clear_interrupt();
@@ -140,15 +151,17 @@ mod app {
         // Do our matrix scan & usb report
         // this should be fixed timing smaller than the USB timer period
         // so complete before the next IRQ
-        cx.shared.usb.tick();
         cx.shared.scan.scan();
+        cx.shared.usb.tick(cx.shared.keys);
+        
+        // cx.shared.alarm.schedule(MicrosDurationU32::Hz(1)).unwrap();
 
     }
 
-    #[task(binds = DMA_IRQ_0, shared = [scan])]
+    #[task(binds = DMA_IRQ_0, shared = [keys, scan])]
     fn scan_dma_completion(cx: scan_dma_completion::Context) {
         let scan = cx.shared.scan;
-        scan.dma_completion();
+        scan.dma_completion(cx.shared.keys);
     }
 }
 

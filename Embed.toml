@@ -1,6 +1,6 @@
 [default.probe]
 protocol = "Swd"
-speed = 20000
+# speed = 20000
 # If you only have one probe cargo embed will pick automatically
 # Otherwise: add your probe's VID/PID/serial to filter
 
@@ -18,19 +18,16 @@ enabled = true
 halt_afterwards = false
 
 [default.general]
-chip = "RP2040"
+chip = "RP235x"
 log_level = "WARN"
 # RP2040 does not support connect_under_reset
 connect_under_reset = false
 
 [default.rtt]
 enabled = true
-up_mode = "NoBlockSkip"
-channels = [
-    { up = 0, down = 0, name = "name", up_mode = "NoBlockSkip", format = "Defmt" },
+up_channels = [
+  { channel = 0, mode = "NoBlockSkip", format = "Defmt", show_location = true },
 ]
-timeout = 3000
-show_timestamps = true
 log_enabled = false
 log_path = "./logs"
 

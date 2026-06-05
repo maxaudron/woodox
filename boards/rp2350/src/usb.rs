@@ -9,7 +9,7 @@ use usbd_human_interface_device::device::keyboard::{NKROBootKeyboard, NKROBootKe
 
 use frunk_core::hlist::{HCons, HNil};
 
-use woodox_lib::matrix;
+use woodox_lib::matrix::KeyboardState;
 
 pub struct Usb<U>
 where
@@ -41,13 +41,13 @@ where
         Self { hid, dev }
     }
 
-    pub fn tick(&mut self) {
-        let keys = matrix::Keymap::keyboard();
-
-        match self.hid.device().write_report(keys) {
+    pub fn tick(&mut self, keys: &mut KeyboardState) {
+        match self.hid.device().write_report(keys.matrix) {
             Err(UsbHidError::WouldBlock) => {}
             Err(UsbHidError::Duplicate) => {}
-            Ok(_) => {}
+            Ok(_) => {
+                info!("usb write ok")
+            }
             Err(e) => {
                 core::panic!("Failed to write keyboard report: {:?}", e)
             }
@@ -61,7 +61,7 @@ where
             }
         };
 
-        matrix::Keymap::clear_oneshot();
+        keys.clear_oneshot();
 
         if self.dev.poll(&mut [&mut self.hid]) {
             match self.hid.device().read_report() {

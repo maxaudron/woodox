@@ -1,6 +1,9 @@
-use defmt::{debug, info};
+use defmt::{error, trace, warn};
 
-use woodox_lib::{layout::default_switches, matrix::ScanOrder};
+use woodox_lib::{
+    layout::default_switches,
+    matrix::{KeyboardState, ScanOrder},
+};
 
 use crate::{
     hal::{
@@ -16,8 +19,6 @@ use crate::{
 
 #[cfg(feature = "timers")]
 use crate::hal::pac::TIMER;
-#[cfg(feature = "timers")]
-use defmt::debug;
 
 use woodox_lib::layout::*;
 
@@ -55,42 +56,52 @@ impl<'a> ScanState<'a> {
     }
 
     pub fn scan(&mut self) {
-        info!("initiated new full matrix scan");
-        self.channel = 0;
-        self.dma_completion();
+        if self.transfer.is_some() {
+            error!("transfer already in progress. aborting!");
+        } else {
+            trace!("initiated new full matrix scan");
+            self.channel = 0;
+            self.scan_one();
+        }
     }
 
     /// Triggered by DMA_IRQ_0 interrupt
-    pub fn dma_completion(&mut self) {
-        debug!("completed dma transfer for channel: {}", self.channel);
+    pub fn dma_completion(&mut self, keys: &mut KeyboardState) {
+        trace!("completed dma transfer for channel: {}", self.channel);
         self.fifo.pause();
-        let transfer = self.transfer.take().unwrap();
+        if let Some(transfer) = self.transfer.take() {
+            let (mut ch, _target, buf) = transfer.wait();
+            ch.check_irq0();
 
-        let (ch, _target, buf) = transfer.wait();
+            let res = buf
+                .iter()
+                .enumerate()
+                .fold([0; NUM_MUX], |mut acc, (i, &s)| {
+                    acc[i % NUM_MUX] += s;
+                    acc
+                })
+                .map(|s| s / NUM_MUX as u8);
 
-        let res = buf
-            .iter()
-            .enumerate()
-            .fold([0; NUM_MUX], |mut acc, (i, &s)| {
-                acc[i % NUM_MUX] += s;
-                acc
-            })
-            .map(|s| s / NUM_MUX as u8);
+            self.scan.scans[self.channel as usize].update(res);
+            trace!("completed update for channel: {}", self.channel);
 
-        self.scan.scans[self.channel as usize].update(res);
-        debug!("completed update for channel: {}", self.channel);
+            self.dma = Some(ch);
+            self.buf = Some(buf);
+        } else {
+            warn!("dma completed but no transfer was found");
+        }
 
-        self.dma = Some(ch);
-        self.buf = Some(buf);
-
-        if self.channel < NUM_CHANNELS as u8 {
-            self.channel += 1;
+        if self.channel < (NUM_CHANNELS as u8) - 1 {
             self.scan_one();
+        } else {
+            trace!("stopping scan round on channel {}", self.channel);
+            keys.update(&self.scan);
         }
     }
 
     /// Switch the active mux input and initiate the adc dma transfer
     fn scan_one(&mut self) {
+        trace!("initiated scan for channel {}", self.channel);
         self.mux.set_output_active(self.channel);
         self.fifo.clear();
 
@@ -98,7 +109,8 @@ impl<'a> ScanState<'a> {
         let dma = self.dma.take().unwrap();
         self.transfer = Some(single_buffer::Config::new(dma, self.fifo.dma_read_target(), buf).start());
         self.fifo.resume();
-        debug!("resumed adc dma transfer for channel: {}", self.channel);
+
+        self.channel += 1;
     }
 }
 
@@ -143,7 +155,7 @@ impl<'a> ScanState<'a> {
 //         #[cfg(feature = "timers")]
 //         let time2 = unsafe { get_counter(&(*timer)) };
 //         #[cfg(feature = "timers")]
-//         debug!("scan time: {}µs", (time2 - time1));
+//         trace!("scan time: {}µs", (time2 - time1));
 //     }
 // }
 //

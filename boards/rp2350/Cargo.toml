@@ -11,7 +11,6 @@ cortex-m = "0.7"
 cortex-m-rt = "0.7"
 embedded-hal = "1"
 embedded-time = "0.12"
-critical-section = "1"
 
 defmt = "1"
 defmt-rtt = "1"
@@ -23,7 +22,7 @@ fugit = "0.3.9"
 frunk_core = { version = "0.4", default-features = false }
 packed_struct = { version = "0", default-features = false }
 
-rp235x-hal = { version="0.4", features = ["binary-info", "critical-section-impl", "rt", "defmt"] }
+rp235x-hal = { git = "https://github.com/maxaudron/rp-hal", branch = "rp2350-qfn80", features = ["binary-info", "critical-section-impl", "rt", "defmt", "qfn80"] }
 
 # ws2812-pio = "0.9"
 # smart-leds = "0.4"

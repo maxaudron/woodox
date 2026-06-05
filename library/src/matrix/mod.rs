@@ -36,6 +36,26 @@ impl Scan {
     }
 }
 
+impl IntoIterator for Scan {
+    type Item = Switch;
+
+    type IntoIter = core::array::IntoIter<Switch, NUM_MUX>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.switches.into_iter()
+    }
+}
+
+impl IntoIterator for &Scan {
+    type Item = Switch;
+
+    type IntoIter = core::array::IntoIter<Switch, NUM_MUX>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.switches.into_iter()
+    }
+}
+
 /// The order we will execute all the scans in
 ///
 /// Technically the order does not matter, but we want to keep it
@@ -59,5 +79,25 @@ impl ScanOrder {
         });
 
         ScanOrder { scans }
+    }
+}
+
+impl IntoIterator for ScanOrder {
+    type Item = Scan;
+
+    type IntoIter = core::array::IntoIter<Scan, NUM_CHANNELS>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.scans.into_iter()
+    }
+}
+
+impl IntoIterator for &ScanOrder {
+    type Item = Scan;
+
+    type IntoIter = core::array::IntoIter<Scan, NUM_CHANNELS>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.scans.into_iter()
     }
 }
