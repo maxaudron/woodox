@@ -1,7 +1,7 @@
 /// Number of multiplexers connected to ADC
-pub const NUM_MUX: usize = 4;
+pub const NUM_MUX: usize = 1;
 /// Total number of switches
-pub const NUM_SWITCHES: usize = 32;
+pub const NUM_SWITCHES: usize = 8;
 /// Number of scans needed to scan all switches
 ///
 /// This depends on the number of mux and number of switches.
@@ -19,26 +19,18 @@ pub const HOLD_TIME: u32 = 8000;
 pub const SAMPLES: usize = 4;
 
 switches! {
-    0;1, 0;0, 0;5, 0;7, 0;6, 0;4,
-    1;1, 1;0, 1;5, 1;7, 1;6, 1;4,
-    2;1, 2;0, 2;5, 2;7, 2;6, 2;4,
-    3;1, 3;0, 3;5, 3;7, 3;6, 3;4, 0;3, 1;3,
-    0;2,      1;2, 2;2,    3;2,   3;3, 2;3,
+    0;1, 0;0, 0;5, 0;7, 0;6, 0;4, 0;2, 0;3,
 }
 
 keymap! {
     0 = layer! [
-        GrvEsc,         Key(Keyboard1), Key(Keyboard2), Key(Keyboard3), Key(Keyboard4), Key(Keyboard5),
-        Key(Tab),       Key(Q), Key(W), Key(R), Key(T), Key(Y),
-        Key(LeftControl),  Key(A), Key(S), Key(D), Key(F), Key(G),
-        Key(LeftShift), Key(Z), Key(X), Key(C), Key(V), Key(B), Key(B), Key(B),
-        LayerTap(1, L),     Key(F), Key(G),     Key(LeftShift), Key(Space), Key(DeleteBackspace),
+        GrvEsc,         Key(Keyboard1), Key(Keyboard2), Key(Keyboard3), Key(Keyboard4), Key(Keyboard5), Key(A), Key(B),
     ];
-    1 = layer! [
-        GrvEsc,         Key(Keyboard1), Key(Keyboard2), Key(Keyboard3), Key(Keyboard4), Key(Keyboard5),
-        Key(Tab),       Key(Q), Key(W), Key(R), Key(T), Key(Y),
-        Key(LeftControl),  Key(A), Key(S), Key(D), Key(F), Key(G),
-        Key(LeftShift), Key(Z), Key(X), Key(C), Key(V), Key(B), Key(B), Key(B),
-        LayerTap(1, L),     Key(F), Key(G),     Key(LeftShift), Key(Space), Key(DeleteBackspace),
-    ];
+    // 1 = layer! [
+    //     GrvEsc,         Key(Keyboard1), Key(Keyboard2), Key(Keyboard3), Key(Keyboard4), Key(Keyboard5),
+    //     Key(Tab),       Key(Q), Key(W), Key(R), Key(T), Key(Y),
+    //     Key(LeftControl),  Key(A), Key(S), Key(D), Key(F), Key(G),
+    //     Key(LeftShift), Key(Z), Key(X), Key(C), Key(V), Key(B), Key(B), Key(B),
+    //     LayerTap(1, L),     Key(F), Key(G),     Key(LeftShift), Key(Space), Key(DeleteBackspace),
+    // ];
 }

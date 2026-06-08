@@ -76,8 +76,8 @@ impl KeyboardState {
     }
 
     pub fn update(&mut self, scan: &ScanOrder) {
-        scan.scans.iter().flatten().for_each(|s| self.update_switch(s));
-        todo!()
+        // scan.scans.iter().flatten().for_each(|s| self.update_switch(s));
+        // todo!()
     }
 
     pub fn clear_oneshot(&mut self) {

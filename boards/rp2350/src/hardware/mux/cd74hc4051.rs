@@ -1,42 +1,53 @@
 use crate::hal::gpio::{
     FunctionSio, Pin, PullDown, SioOutput,
-    bank0::{Gpio29, Gpio30, Gpio31},
+    bank0::{Gpio29, Gpio30, Gpio31, Gpio32},
 };
 use embedded_hal::digital::OutputPin;
 
 use crate::hardware::mux::Mux;
 
+pub type MuxEnable = Pin<Gpio32, FunctionSio<SioOutput>, PullDown>;
 pub type MuxPin1 = Pin<Gpio31, FunctionSio<SioOutput>, PullDown>;
 pub type MuxPin2 = Pin<Gpio30, FunctionSio<SioOutput>, PullDown>;
 pub type MuxPin3 = Pin<Gpio29, FunctionSio<SioOutput>, PullDown>;
 
-pub struct CD74HC4051<A, B, C> {
-    pin_0: A,
-    pin_1: B,
-    pin_2: C,
+pub struct CD74HC4051<A, B, C, D> {
+    enable: A,
+    pin_0: B,
+    pin_1: C,
+    pin_2: D,
 }
 
-impl<A, B, C> CD74HC4051<A, B, C>
+impl<A, B, C, D> CD74HC4051<A, B, C, D>
 where
     A: OutputPin,
     B: OutputPin,
     C: OutputPin,
+    D: OutputPin,
 {
-    pub fn new(mut pin_0: A, mut pin_1: B, mut pin_2: C) -> Self {
+    pub fn new(mut enable: A, mut pin_0: B, mut pin_1: C, mut pin_2: D) -> Self {
         // Set to output 0
         pin_0.set_low().unwrap();
         pin_1.set_low().unwrap();
         pin_2.set_low().unwrap();
 
-        Self { pin_0, pin_1, pin_2 }
+        enable.set_low().unwrap();
+
+        Self {
+            enable,
+            pin_0,
+            pin_1,
+            pin_2,
+        }
     }
 }
 
-impl<A, B, C> Mux for CD74HC4051<A, B, C>
+impl<A, B, C, D> Mux for CD74HC4051<A, B, C, D>
 where
     A: OutputPin,
     B: OutputPin,
     C: OutputPin,
+    D: OutputPin,
 {
     /// Enable output `n`. `n` must be between 0 and 7 inclusive.
     /// If a SelectPinError occurs, the select is left in a possibly unwanted state, but it is disabled here.

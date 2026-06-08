@@ -1,4 +1,4 @@
-use defmt::{error, trace, warn};
+use defmt::{error, info, trace, warn};
 
 use woodox_lib::{
     layout::default_switches,
@@ -14,7 +14,7 @@ use crate::{
         },
         singleton,
     },
-    hardware::mux::{CD74HC4051, Mux, MuxPin1, MuxPin2, MuxPin3},
+    hardware::mux::{CD74HC4051, Mux, MuxEnable, MuxPin1, MuxPin2, MuxPin3},
 };
 
 #[cfg(feature = "timers")]
@@ -25,7 +25,7 @@ use woodox_lib::layout::*;
 const BUFFER: usize = NUM_MUX * SAMPLES;
 
 pub struct ScanState<'a> {
-    mux: CD74HC4051<MuxPin1, MuxPin2, MuxPin3>,
+    mux: CD74HC4051<MuxEnable, MuxPin1, MuxPin2, MuxPin3>,
     dma: Option<Channel<CH0>>,
     fifo: AdcFifo<'a, u8>,
 
@@ -37,7 +37,7 @@ pub struct ScanState<'a> {
 
 impl<'a> ScanState<'a> {
     pub fn new(
-        mux: CD74HC4051<MuxPin1, MuxPin2, MuxPin3>,
+        mux: CD74HC4051<MuxEnable, MuxPin1, MuxPin2, MuxPin3>,
         mut dma: Channel<CH0>,
         fifo: AdcFifo<'a, u8>,
     ) -> Self {
@@ -82,11 +82,19 @@ impl<'a> ScanState<'a> {
                 })
                 .map(|s| s / NUM_MUX as u8);
 
+            if self.channel == 0 {
+                for i in 0..200 {
+                    info!("{:?}", res[0]);
+                }
+            }
+
             self.scan.scans[self.channel as usize].update(res);
             trace!("completed update for channel: {}", self.channel);
 
             self.dma = Some(ch);
             self.buf = Some(buf);
+
+            self.channel += 1;
         } else {
             warn!("dma completed but no transfer was found");
         }
@@ -109,8 +117,6 @@ impl<'a> ScanState<'a> {
         let dma = self.dma.take().unwrap();
         self.transfer = Some(single_buffer::Config::new(dma, self.fifo.dma_read_target(), buf).start());
         self.fifo.resume();
-
-        self.channel += 1;
     }
 }
 
