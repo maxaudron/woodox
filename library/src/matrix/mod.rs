@@ -32,7 +32,7 @@ impl Scan {
         self.switches
             .iter_mut()
             .zip(values)
-            .for_each(|(switch, value)| switch.update(value))
+            .for_each(|(switch, value)| switch.update_raw(value))
     }
 }
 

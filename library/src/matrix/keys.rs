@@ -57,6 +57,8 @@ pub type Layer = [Key; NUM_SWITCHES];
 pub const NUM_LAYERS: usize = 32;
 pub const NUM_KEYCODES: usize = 231 * 2;
 
+/// Represents the state of the keyboard report as send through
+/// USB and maps the physical switch states to the logical keymap
 pub struct KeyboardState {
     pub matrix: [Keyboard; NUM_KEYCODES],
     pub keymap: Keymap,
@@ -76,8 +78,7 @@ impl KeyboardState {
     }
 
     pub fn update(&mut self, scan: &ScanOrder) {
-        // scan.scans.iter().flatten().for_each(|s| self.update_switch(s));
-        // todo!()
+        scan.scans.iter().flatten().for_each(|s| self.update_switch(s));
     }
 
     pub fn clear_oneshot(&mut self) {

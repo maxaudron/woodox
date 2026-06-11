@@ -40,8 +40,8 @@ mod app {
     struct Shared {
         #[lock_free]
         keys: KeyboardState,
-        // #[lock_free]
-        // scan: ScanState<'static>,
+        #[lock_free]
+        scan: ScanState<'static>,
         #[lock_free]
         usb: Usb<UsbBus>,
         #[lock_free]
@@ -105,25 +105,18 @@ mod app {
         let adc = c.local.adc.as_mut().unwrap();
 
         let mut adc_pin_0 = AdcPin::new(pins.mux1_com.into_floating_input()).unwrap();
-        // let adc_pin_1 = AdcPin::new(pins.mux2_com.into_floating_input()).unwrap();
-        // let adc_pin_2 = AdcPin::new(pins.mux3_com.into_floating_input()).unwrap();
-        // let adc_pin_3 = AdcPin::new(pins.mux4_com.into_floating_input()).unwrap();
+        let mut adc_pin_1 = AdcPin::new(pins.mux2_com.into_floating_input()).unwrap();
+        let mut adc_pin_2 = AdcPin::new(pins.mux3_com.into_floating_input()).unwrap();
+        let mut adc_pin_3 = AdcPin::new(pins.mux4_com.into_floating_input()).unwrap();
 
-        mux.set_output_active(0);
-        adc.free_running(&adc_pin_0);
-        while true {
-            let res = adc.read_single().unwrap();
-            info!("{}", res >> 4);
-        }
-
-        // let fifo = adc
-        //     .build_fifo()
-        //     .round_robin((&adc_pin_0, &adc_pin_1, &adc_pin_2, &adc_pin_3))
-        //     .set_channel(&mut adc_pin_0)
-        //     .shift_8bit()
-        //     .enable_dma()
-        //     .start_paused();
-        // let scan = ScanState::new(mux, dma.ch0, fifo);
+        let fifo = adc
+            .build_fifo()
+            .round_robin((&adc_pin_0, &adc_pin_1, &adc_pin_2, &adc_pin_3))
+            .set_channel(&mut adc_pin_0)
+            .shift_8bit()
+            .enable_dma()
+            .start_paused();
+        let scan = ScanState::new(mux, dma.ch0, fifo, timer);
 
         info!("adc initialization finished");
 
@@ -144,30 +137,30 @@ mod app {
 
         let keys = KeyboardState::new();
 
-        (Shared { keys, /*scan,*/ usb, alarm }, Local {})
+        (Shared { keys, scan, usb, alarm }, Local {})
     }
 
-    // #[task(binds = TIMER0_IRQ_0, shared = [keys, adc, usb, alarm])]
-    // fn usb_timer_alarm(cx: usb_timer_alarm::Context) {
-    //     // Schedule next USB interrupt instantly
-    //     cx.shared.alarm.clear_interrupt();
-    //     cx.shared.alarm.schedule(MicrosDurationU32::Hz(1000)).unwrap();
+    #[task(binds = TIMER0_IRQ_0, shared = [keys, scan, usb, alarm])]
+    fn usb_timer_alarm(cx: usb_timer_alarm::Context) {
+        // Schedule next USB interrupt instantly
+        cx.shared.alarm.clear_interrupt();
+        cx.shared.alarm.schedule(MicrosDurationU32::Hz(1000)).unwrap();
         
         // Do our matrix scan & usb report
         // this should be fixed timing smaller than the USB timer period
         // so complete before the next IRQ
-        // cx.shared.scan.scan();
-        // cx.shared.usb.tick(cx.shared.keys);
+        cx.shared.scan.scan();
+        cx.shared.usb.tick(cx.shared.keys);
         
         // cx.shared.alarm.schedule(MicrosDurationU32::Hz(1)).unwrap();
 
-    // }
+    }
 
-    // #[task(binds = DMA_IRQ_0, shared = [keys, scan])]
-    // fn scan_dma_completion(cx: scan_dma_completion::Context) {
-        // let scan = cx.shared.scan;
-        // scan.dma_completion(cx.shared.keys);
-    // }
+    #[task(binds = DMA_IRQ_0, shared = [keys, scan])]
+    fn scan_dma_completion(cx: scan_dma_completion::Context) {
+        let scan = cx.shared.scan;
+        scan.dma_completion(cx.shared.keys);
+    }
 }
 
 hal::bsp_pins!(

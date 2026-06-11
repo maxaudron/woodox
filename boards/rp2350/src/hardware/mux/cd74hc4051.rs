@@ -70,8 +70,8 @@ where
             self.pin_2.set_low().unwrap();
         }
 
-        // Wait one cpu cycle (8ns) for mux to settle
+        // Wait one cpu cycle (7.5ns rp2040) (6.7 rp2350) for mux to settle
         // FIXME TODO try without this
-        cortex_m::asm::delay(1);
+        cortex_m::asm::delay(28); // 120ns
     }
 }
