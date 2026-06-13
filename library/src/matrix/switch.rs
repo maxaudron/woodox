@@ -4,10 +4,11 @@ use crate::layout::HOLD_TIME;
 
 #[derive(Debug, Default, Format, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SwitchState {
+    Pressed,
     #[default]
     Unpressed,
-    Pressed,
     RapidPressed,
+    RapidUnpressed,
     Held,
     OneShot,
 }
@@ -41,9 +42,9 @@ pub struct Switch {
     pub hold_counter: u32,
 
     /// Boundry that triggers a press
-    pub trig_lower: u8,
+    pub trig_press: u8,
     /// Boundry that triggers a release
-    pub trig_upper: u8,
+    pub trig_release: u8,
 
     /// If repid trigger is enabled for this switch,
     pub rapid_enabled: bool,
@@ -69,13 +70,13 @@ pub struct Switch {
 impl Default for Switch {
     fn default() -> Self {
         Self {
-            position: u8::MAX,
+            position: 0,
 
-            trig_lower: 20,
-            trig_upper: 22,
+            trig_press: 20,
+            trig_release: 18,
 
             rapid_enabled: false,
-            rapid_last_position: u8::MAX,
+            rapid_last_position: 0,
             rapid_lower: 4,
             rapid_upper: 4,
 
@@ -102,8 +103,8 @@ impl Switch {
             mux,
             channel,
             position: 0,
-            trig_lower: 0,
-            trig_upper: 0,
+            trig_press: 0,
+            trig_release: 0,
             rapid_enabled: false,
             rapid_last_position: 0,
             rapid_lower: 0,
@@ -136,7 +137,9 @@ impl Switch {
 
     #[inline(always)]
     pub fn released(&mut self, rapid: bool) {
-        if rapid || self.state != SwitchState::RapidPressed {
+        if rapid && self.position > self.trig_press {
+            self.state = SwitchState::RapidUnpressed
+        } else {
             self.state = SwitchState::Unpressed
         }
 
@@ -159,17 +162,18 @@ impl Switch {
     #[inline(always)]
     pub fn update_rapid(&mut self) {
         if self.state == SwitchState::RapidPressed {
-            if self.position >= (self.rapid_last_position.saturating_add(self.rapid_upper)) {
+            if self.position <= (self.rapid_last_position.saturating_sub(self.rapid_upper)) {
                 self.rapid_last_position = self.position;
                 self.released(true)
             } else {
-                if self.position < self.rapid_last_position {
+                if self.position > self.rapid_last_position {
                     self.rapid_last_position = self.position;
                 }
                 self.held(true);
             }
-        } else if self.position <= (self.rapid_last_position.saturating_sub(self.rapid_lower))
-            || self.position <= self.trig_lower
+        } else if (self.state == SwitchState::RapidUnpressed
+            && self.position >= (self.rapid_last_position.saturating_add(self.rapid_lower)))
+            || self.position >= self.trig_press
         {
             self.rapid_last_position = self.position;
             self.pressed(true)
@@ -184,12 +188,12 @@ impl Switch {
             self.update_rapid()
         } else {
             if self.state == SwitchState::Pressed || self.state == SwitchState::Held {
-                if self.position >= self.trig_upper {
+                if self.position <= self.trig_release {
                     self.released(false)
                 } else {
                     self.held(false);
                 }
-            } else if self.position <= self.trig_lower {
+            } else if self.position >= self.trig_press {
                 self.pressed(false)
             }
         }
@@ -269,13 +273,13 @@ mod tests {
     #[test]
     fn default_has_expected_thresholds() {
         let s = default_switch();
-        assert_eq!(s.trig_lower, 20);
-        assert_eq!(s.trig_upper, 22);
+        assert_eq!(s.trig_press, 20);
+        assert_eq!(s.trig_release, 18);
         assert_eq!(s.rapid_lower, 4);
         assert_eq!(s.rapid_upper, 4);
         assert_eq!(s.offset, 26);
-        assert_eq!(s.position, u8::MAX);
-        assert_eq!(s.rapid_last_position, u8::MAX);
+        assert_eq!(s.position, 0);
+        assert_eq!(s.rapid_last_position, 0);
     }
 
     // ── Switch::pressed() / released() direct ────────────────────
@@ -323,13 +327,13 @@ mod tests {
     }
 
     #[test]
-    fn released_normal_preserves_rapid_pressed() {
+    fn released_normal_rapid_pressed() {
         let mut s = default_switch();
         s.state = SwitchState::RapidPressed;
         s.position = 50;
         s.released(false);
 
-        assert_eq!(s.state, SwitchState::RapidPressed);
+        assert_eq!(s.state, SwitchState::Unpressed);
         assert_eq!(s.rapid_last_position, 50);
     }
 
@@ -340,7 +344,7 @@ mod tests {
         s.position = 50;
         s.released(true);
 
-        assert_eq!(s.state, SwitchState::Unpressed);
+        assert_eq!(s.state, SwitchState::RapidUnpressed);
         assert_eq!(s.rapid_last_position, 50);
     }
 
@@ -429,8 +433,7 @@ mod tests {
     #[test]
     fn update_press_at_threshold() {
         let mut s = default_switch();
-        // trig_lower = 20, so 19 <= 20 -> pressed
-        s.update(19);
+        s.update(20);
         assert_eq!(s.state, SwitchState::Pressed);
     }
 
@@ -442,30 +445,30 @@ mod tests {
         assert!(s.state.is_pressed());
 
         let mut s2 = default_switch();
-        // 22 <= 20 is false -> not pressed
-        s2.update(22);
+        // 18 <= 20 is false -> not pressed
+        s2.update(18);
         assert!(!s2.state.is_pressed());
     }
 
     #[test]
     fn update_release_at_upper_threshold() {
         let mut s = default_switch();
-        s.update(19);
+        s.update(20);
         assert!(s.state.is_pressed());
 
-        // trig_upper = 22, 22 >= 22 -> released
-        s.update(22);
+        // trig_upper = 18, 18 >= 18 -> released
+        s.update(18);
         assert_eq!(s.state, SwitchState::Unpressed);
     }
 
     #[test]
     fn update_stays_pressed_between_thresholds() {
         let mut s = default_switch();
-        s.update(19);
+        s.update(20);
         assert!(s.state.is_pressed());
 
         // distance(110) = 47, comp = 26, position = 21
-        // trig_upper = 22, 21 >= 22 is false -> stays pressed
+        // trig_upper = 18, 21 >= 18 is false -> stays pressed
         s.update(21);
         assert!(s.state.is_pressed());
     }
@@ -474,19 +477,19 @@ mod tests {
     fn update_hysteresis_prevents_bounce() {
         let mut s = default_switch();
 
-        s.update(19); // pos = 19, <= 20 -> press
+        s.update(20); // pos = 20, <= 20 -> press
         assert!(s.state.is_pressed());
 
-        s.update(21); // pos = 21, < 22 -> still pressed
+        s.update(19); // pos = 19, < 18 -> still pressed
         assert!(s.state.is_pressed());
 
-        s.update(22); // pos = 22, >= 22 -> release
+        s.update(18); // pos = 18, >= 18 -> release
         assert!(!s.state.is_pressed());
 
-        s.update(21); // pos = 21, > 20 -> stays unpressed
+        s.update(19); // pos = 21, > 20 -> stays unpressed
         assert!(!s.state.is_pressed());
 
-        s.update(19); // pos = 19, <= 20 -> press again
+        s.update(20); // pos = 20, <= 20 -> press again
         assert!(s.state.is_pressed());
     }
 
@@ -508,12 +511,12 @@ mod tests {
     #[test]
     fn update_hold_accumulates_while_pressed() {
         let mut s = default_switch();
-        s.update(19);
+        s.update(20);
         assert!(s.state.is_pressed());
         assert_eq!(s.hold_counter, 0);
 
         for i in 1..=5 {
-            s.update(19);
+            s.update(20);
             assert_eq!(s.hold_counter, i);
         }
     }
@@ -521,29 +524,29 @@ mod tests {
     #[test]
     fn update_hold_triggers_after_hold_time_plus_one_updates() {
         let mut s = default_switch();
-        s.update(19); // initial press, hold_counter = 0
+        s.update(20); // initial press, hold_counter = 0
 
         for _ in 0..HOLD_TIME {
-            s.update(19);
+            s.update(20);
         }
         assert!(!s.state.is_held());
         assert_eq!(s.hold_counter, HOLD_TIME);
 
-        s.update(19);
+        s.update(20);
         assert_eq!(s.state, SwitchState::Held);
     }
 
     #[test]
     fn update_held_key_can_still_be_released() {
         let mut s = default_switch();
-        s.update(19);
+        s.update(20);
 
         for _ in 0..=HOLD_TIME {
-            s.update(19);
+            s.update(20);
         }
         assert_eq!(s.state, SwitchState::Held);
 
-        s.update(22); // pos = 22, >= trig_upper(22) -> released
+        s.update(18); // pos = 18, >= trig_upper(18) -> released
         assert_eq!(s.state, SwitchState::Unpressed);
     }
 
@@ -551,20 +554,20 @@ mod tests {
     fn update_hold_counter_resets_on_release() {
         let mut s = default_switch();
 
-        s.update(19);
+        s.update(20);
         for _ in 0..100 {
-            s.update(19);
+            s.update(20);
         }
         assert_eq!(s.hold_counter, 100);
 
-        s.update(22);
+        s.update(18);
         assert_eq!(s.state, SwitchState::Unpressed);
         assert_eq!(s.hold_counter, 0);
 
         // Second press starts counting from 0
-        s.update(19);
+        s.update(20);
         assert_eq!(s.hold_counter, 0);
-        s.update(19);
+        s.update(20);
         assert_eq!(s.hold_counter, 1);
     }
 
@@ -575,28 +578,97 @@ mod tests {
         let mut s = rapid_switch();
 
         // Normal press
-        s.update(18); // pos = 19
+        s.update(20);
         assert_eq!(s.state, SwitchState::RapidPressed);
 
-        // Rapid press: pos 15 <= 19 - 4 = 15
-        s.update(14); // pos = 15
+        // Rapid press
+        s.update(24);
         assert_eq!(s.state, SwitchState::RapidPressed);
 
-        // Rapid release: pos 19 >= 15 + 4 = 19
-        s.update(18); // pos = 19
+        // Rapid release
+        s.update(20);
         assert_eq!(s.state, SwitchState::Unpressed);
 
-        // Rapid re-press: pos 15 <= 19 - 4 = 15
-        s.update(15); // pos = 15
+        // Rapid re-press
+        s.update(26);
         assert_eq!(s.state, SwitchState::RapidPressed);
-        // Gradual release
-        s.update(15); // pos = 15
-        s.update(16); // pos = 15
-        s.update(17); // pos = 15
 
         // Rapid release again
-        s.update(19); // pos = 19
+        s.update(22);
+        assert_eq!(s.state, SwitchState::RapidUnpressed);
+    }
+
+    #[test]
+    fn update_rapid_release_above_treshold() {
+        let mut s = rapid_switch();
+
+        s.update(20);
+        assert_eq!(s.state, SwitchState::RapidPressed);
+        s.update(18);
+        assert_eq!(s.rapid_last_position, 20);
+
+        s.update(16);
         assert_eq!(s.state, SwitchState::Unpressed);
+    }
+
+    #[test]
+    fn update_rapid_gradual_release() {
+        let mut s = rapid_switch();
+
+        s.update(26);
+        assert_eq!(s.state, SwitchState::RapidPressed);
+        s.update(25);
+        s.update(24);
+        s.update(23);
+        s.update(22);
+        assert_eq!(s.rapid_last_position, 22);
+        assert_eq!(s.state, SwitchState::RapidUnpressed);
+    }
+
+    #[test]
+    fn update_rapid_gradual_release_above_thresh() {
+        let mut s = rapid_switch();
+
+        s.update(20);
+        assert_eq!(s.state, SwitchState::RapidPressed);
+        s.update(19);
+        s.update(18);
+        s.update(17);
+        s.update(16);
+        s.update(15);
+        assert_eq!(s.rapid_last_position, 16);
+        assert_eq!(s.state, SwitchState::Unpressed);
+    }
+
+    #[test]
+    fn update_rapid_gradual_press() {
+        let mut s = rapid_switch();
+
+        s.update(16);
+        assert_eq!(s.state, SwitchState::Unpressed);
+        s.update(17);
+        s.update(18);
+        s.update(19);
+        s.update(20);
+        assert_eq!(s.rapid_last_position, 20);
+        assert_eq!(s.state, SwitchState::RapidPressed);
+    }
+
+    #[test]
+    fn update_rapid_only_after_normal_press() {
+        let mut s = rapid_switch();
+
+        assert_eq!(s.state, SwitchState::Unpressed);
+        s.update(14);
+        assert_eq!(s.state, SwitchState::Unpressed);
+        s.update(15);
+        s.update(16);
+        s.update(17);
+        assert_eq!(s.rapid_last_position, 0);
+        assert_eq!(s.state, SwitchState::Unpressed);
+
+        s.update(20);
+        assert_eq!(s.state, SwitchState::RapidPressed);
     }
 
     // ── update_rapid arithmetic edge cases ───────────────────────
@@ -634,10 +706,10 @@ mod tests {
         let mut s = default_switch();
         assert_eq!(s.state, SwitchState::Unpressed);
 
-        s.update(19);
+        s.update(20);
         assert_eq!(s.state, SwitchState::Pressed);
 
-        s.update(22);
+        s.update(18);
         assert_eq!(s.state, SwitchState::Unpressed);
     }
 
@@ -645,15 +717,15 @@ mod tests {
     fn state_transitions_press_hold_release() {
         let mut s = default_switch();
 
-        s.update(19);
+        s.update(20);
         assert_eq!(s.state, SwitchState::Pressed);
 
         for _ in 0..=HOLD_TIME {
-            s.update(19);
+            s.update(20);
         }
         assert_eq!(s.state, SwitchState::Held);
 
-        s.update(22);
+        s.update(18);
         assert_eq!(s.state, SwitchState::Unpressed);
     }
 
@@ -662,10 +734,10 @@ mod tests {
         let mut s = default_switch();
         assert!(!s.rapid_enabled);
 
-        s.update(19);
+        s.update(20);
         assert_eq!(s.state, SwitchState::Pressed);
 
-        s.update(15); // deeper, but rapid disabled
+        s.update(25); // deeper, but rapid disabled
         assert_eq!(s.state, SwitchState::Pressed);
     }
 
