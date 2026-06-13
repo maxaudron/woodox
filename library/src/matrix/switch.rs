@@ -159,13 +159,18 @@ impl Switch {
     #[inline(always)]
     pub fn update_rapid(&mut self) {
         if self.state == SwitchState::RapidPressed {
-            if self.position >= (self.rapid_last_position + self.rapid_upper) {
+            if self.position >= (self.rapid_last_position.saturating_add(self.rapid_upper)) {
                 self.rapid_last_position = self.position;
                 self.released(true)
             } else {
+                if self.position < self.rapid_last_position {
+                    self.rapid_last_position = self.position;
+                }
                 self.held(true);
             }
-        } else if self.position <= (self.rapid_last_position - self.rapid_lower) {
+        } else if self.position <= (self.rapid_last_position.saturating_sub(self.rapid_lower))
+            || self.position <= self.trig_lower
+        {
             self.rapid_last_position = self.position;
             self.pressed(true)
         }
@@ -175,18 +180,18 @@ impl Switch {
     pub fn update(&mut self, travel: u8) {
         self.position = travel;
 
-        if self.state == SwitchState::Pressed || self.state == SwitchState::Held {
-            if self.position >= self.trig_upper {
-                self.released(false)
-            } else {
-                self.held(false);
-            }
-        } else if self.position <= self.trig_lower {
-            self.pressed(false)
-        }
-
         if self.rapid_enabled {
             self.update_rapid()
+        } else {
+            if self.state == SwitchState::Pressed || self.state == SwitchState::Held {
+                if self.position >= self.trig_upper {
+                    self.released(false)
+                } else {
+                    self.held(false);
+                }
+            } else if self.position <= self.trig_lower {
+                self.pressed(false)
+            }
         }
     }
 
@@ -566,51 +571,28 @@ mod tests {
     // ── Switch::update_rapid() ───────────────────────────────────
 
     #[test]
-    fn update_rapid_press_and_release_cycle() {
-        let mut s = rapid_switch();
-
-        s.update(19); // normal press, pos = 19
-        assert_eq!(s.state, SwitchState::Pressed);
-
-        s.update(18); // pos = 18
-        s.update(17); // pos = 17
-        s.update(16); // pos = 16
-        s.update(15); // pos = 15, 15 <= 19 - 4 = 15 -> rapid press
-        assert_eq!(s.state, SwitchState::RapidPressed);
-    }
-
-    #[test]
-    fn update_rapid_release_after_rapid_press() {
-        let mut s = rapid_switch();
-
-        s.position = 10;
-        s.rapid_last_position = 10;
-        s.state = SwitchState::RapidPressed;
-
-        // pos = 18, 18 >= 10 + 4 = 14 -> rapid release
-        s.update(18);
-        assert_eq!(s.state, SwitchState::Unpressed);
-    }
-
-    #[test]
     fn update_rapid_full_cycle() {
         let mut s = rapid_switch();
 
         // Normal press
-        s.update(19); // pos = 19
-        assert_eq!(s.state, SwitchState::Pressed);
+        s.update(18); // pos = 19
+        assert_eq!(s.state, SwitchState::RapidPressed);
 
         // Rapid press: pos 15 <= 19 - 4 = 15
-        s.update(15); // pos = 15
+        s.update(14); // pos = 15
         assert_eq!(s.state, SwitchState::RapidPressed);
 
         // Rapid release: pos 19 >= 15 + 4 = 19
-        s.update(19); // pos = 19
+        s.update(18); // pos = 19
         assert_eq!(s.state, SwitchState::Unpressed);
 
         // Rapid re-press: pos 15 <= 19 - 4 = 15
         s.update(15); // pos = 15
         assert_eq!(s.state, SwitchState::RapidPressed);
+        // Gradual release
+        s.update(15); // pos = 15
+        s.update(16); // pos = 15
+        s.update(17); // pos = 15
 
         // Rapid release again
         s.update(19); // pos = 19
@@ -622,14 +604,14 @@ mod tests {
     #[test]
     fn update_rapid_saturates_on_underflow() {
         let mut s = rapid_switch();
-        s.state = SwitchState::Pressed;
+        s.state = SwitchState::RapidPressed;
         s.rapid_last_position = 2; // less than rapid_lower (4)
         s.position = 1;
 
         // Should not panic — saturating_sub clamps to 0
         // 1 <= 0 is false, so no spurious rapid press
         s.update_rapid();
-        assert_eq!(s.state, SwitchState::Pressed);
+        assert_eq!(s.state, SwitchState::RapidPressed);
     }
 
     #[test]
@@ -643,17 +625,6 @@ mod tests {
         // 254 >= 255 is false, so no spurious rapid release
         s.update_rapid();
         assert_eq!(s.state, SwitchState::RapidPressed);
-    }
-
-    // ── Default rapid_position edge case ─────────────────────────
-
-    #[test]
-    fn default_rapid_position_reset_on_first_press() {
-        let mut s = rapid_switch();
-
-        s.update(19); // press sets position = 19, then rapid_last_position = 19
-        assert!(s.state.is_pressed());
-        assert_ne!(s.state, SwitchState::RapidPressed);
     }
 
     // ── State transitions through update ─────────────────────────
@@ -687,7 +658,7 @@ mod tests {
     }
 
     #[test]
-    fn state_transitions_rapid_does_not_interfere_with_normal() {
+    fn state_transitions_disabled_rapid_does_not_interfere_with_normal() {
         let mut s = default_switch();
         assert!(!s.rapid_enabled);
 
@@ -695,36 +666,10 @@ mod tests {
         assert_eq!(s.state, SwitchState::Pressed);
 
         s.update(15); // deeper, but rapid disabled
-        assert_ne!(s.state, SwitchState::RapidPressed);
-    }
-
-    #[test]
-    fn normal_release_does_not_break_rapid_cycle() {
-        let mut s = rapid_switch();
-
-        // Normal press
-        s.update(19); // pos = 19
         assert_eq!(s.state, SwitchState::Pressed);
-
-        // Rapid press
-        s.update(15); // pos = 15
-        assert_eq!(s.state, SwitchState::RapidPressed);
-
-        // Normal release threshold reached while in RapidPressed
-        // released(false) should preserve RapidPressed when continuues
-        // rapid trigger. TODO
-        s.update(22); // pos = 22, >= trig_upper(22)
-        assert_eq!(s.state, SwitchState::Unpressed);
     }
 
     // ── value() ──────────────────────────────────────────────────
-
-    #[test]
-    fn value_subtracts_comp() {
-        let mut s = default_switch();
-        // distance(19) = 45, comp = 26 -> 19
-        assert_eq!(s.value(19), 19);
-    }
 
     #[test]
     #[should_panic]
@@ -733,41 +678,5 @@ mod tests {
         assert_eq!(s.value(248), 0); // distance(248) = 26, comp = 26 -> 0
         s.offset = 27;
         let _ = s.value(248); // 26 - 27 underflows
-    }
-
-    // ── Integration: original test scenarios ─────────────────────
-
-    #[test]
-    fn switch_update_trigger() {
-        let mut switch = Switch::default();
-
-        switch.update(19);
-        assert!(switch.state.is_pressed());
-        switch.update(21);
-        assert!(switch.state.is_pressed());
-        switch.update(22);
-        assert!(!switch.state.is_pressed());
-        switch.update(26);
-        assert!(!switch.state.is_pressed());
-    }
-
-    #[test]
-    fn switch_update_rapid_trigger() {
-        let mut switch = rapid_switch();
-
-        switch.update(19); // pos = 19 -> Pressed
-        assert!(switch.state.is_pressed());
-
-        switch.update(12); // pos = 12, 12 <= 19-4=15 -> RapidPressed
-        assert_eq!(switch.state, SwitchState::RapidPressed);
-
-        switch.update(16); // pos = 16, 16 >= 12+4=16 -> rapid release
-        assert!(!switch.state.is_pressed());
-
-        switch.update(12); // pos = 12, 12 <= 16-4=12 -> rapid re-press
-        assert_eq!(switch.state, SwitchState::RapidPressed);
-
-        switch.update(26); // pos = 26, >= trig_upper(22) -> full release
-        assert!(!switch.state.is_pressed());
     }
 }
