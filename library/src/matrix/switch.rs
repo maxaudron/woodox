@@ -103,12 +103,12 @@ impl Switch {
             mux,
             channel,
             position: 0,
-            trig_press: 0,
-            trig_release: 0,
+            trig_press: 60,
+            trig_release: 78,
             rapid_enabled: false,
             rapid_last_position: 0,
-            rapid_lower: 0,
-            rapid_upper: 0,
+            rapid_lower: 4,
+            rapid_upper: 4,
             offset: 0,
             index: 0,
             hold_counter: 0,
@@ -121,7 +121,7 @@ impl Switch {
     /// switch defined offset
     #[inline(always)]
     pub fn value(&mut self, value: u8) -> u8 {
-        super::hall::distance(value) - self.offset
+        super::hall::distance_travel(value)
     }
 
     #[inline(always)]

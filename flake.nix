@@ -75,7 +75,7 @@
           devShells.default = craneLib.devShell {
             checks = self.checks.${system};
 
-            DEFMT_LOG = "trace";
+            DEFMT_LOG = "info";
 
             packages = with pkgs; [
               probe-rs-tools

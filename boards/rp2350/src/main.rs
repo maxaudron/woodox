@@ -29,7 +29,7 @@ mod app {
             dma::DMAExt,
             timer::{Alarm, Alarm0, CopyableTimer0},
             usb::UsbBus,
-        }, hardware::mux::Mux, scan::ScanState, usb::Usb
+        }, scan::ScanState, usb::Usb
     };
     use defmt::info;
     use fugit::MicrosDurationU32;
@@ -64,7 +64,7 @@ mod app {
 
         // ------------------------------------
         // Setup core hardware
-        
+
         let mut resets = c.device.RESETS;
         let mut watchdog = hal::watchdog::Watchdog::new(c.device.WATCHDOG);
         let sio = hal::Sio::new(c.device.SIO);
@@ -93,7 +93,7 @@ mod app {
 
         // Initialize MUX
 
-        let mut mux = crate::hardware::mux::CD74HC4051::new(
+        let mux = crate::hardware::mux::CD74HC4051::new(
             pins.mux_enable.into_push_pull_output(),
             pins.mux_s0.into_push_pull_output(),
             pins.mux_s1.into_push_pull_output(),
@@ -105,9 +105,9 @@ mod app {
         let adc = c.local.adc.as_mut().unwrap();
 
         let mut adc_pin_0 = AdcPin::new(pins.mux1_com.into_floating_input()).unwrap();
-        let mut adc_pin_1 = AdcPin::new(pins.mux2_com.into_floating_input()).unwrap();
-        let mut adc_pin_2 = AdcPin::new(pins.mux3_com.into_floating_input()).unwrap();
-        let mut adc_pin_3 = AdcPin::new(pins.mux4_com.into_floating_input()).unwrap();
+        let adc_pin_1 = AdcPin::new(pins.mux2_com.into_floating_input()).unwrap();
+        let adc_pin_2 = AdcPin::new(pins.mux3_com.into_floating_input()).unwrap();
+        let adc_pin_3 = AdcPin::new(pins.mux4_com.into_floating_input()).unwrap();
 
         let fifo = adc
             .build_fifo()
@@ -145,15 +145,12 @@ mod app {
         // Schedule next USB interrupt instantly
         cx.shared.alarm.clear_interrupt();
         cx.shared.alarm.schedule(MicrosDurationU32::Hz(1000)).unwrap();
-        
+
         // Do our matrix scan & usb report
         // this should be fixed timing smaller than the USB timer period
         // so complete before the next IRQ
         cx.shared.scan.scan();
         cx.shared.usb.tick(cx.shared.keys);
-        
-        // cx.shared.alarm.schedule(MicrosDurationU32::Hz(1)).unwrap();
-
     }
 
     #[task(binds = DMA_IRQ_0, shared = [keys, scan])]

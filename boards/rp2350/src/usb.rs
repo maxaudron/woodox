@@ -43,8 +43,12 @@ where
 
     pub fn tick(&mut self, keys: &mut KeyboardState) {
         match self.hid.device().write_report(keys.matrix) {
-            Err(UsbHidError::WouldBlock) => {}
-            Err(UsbHidError::Duplicate) => {}
+            Err(UsbHidError::WouldBlock) => {
+                info!("usb would block")
+            }
+            Err(UsbHidError::Duplicate) => {
+                info!("usb duplicate")
+            }
             Ok(_) => {
                 info!("usb write ok")
             }

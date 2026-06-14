@@ -587,12 +587,12 @@ dependencies = [
 [[package]]
 name = "rp-binary-info"
 version = "0.1.2"
-source = "git+https://github.com/maxaudron/rp-hal?branch=rp2350-qfn80#f1514a0572d187753eac41bc84112ff8aab0b70a"
+source = "git+https://github.com/rp-rs/rp-hal#a8b9676849ea27de72cdf6c9841d76cd6b69b9f2"
 
 [[package]]
 name = "rp-hal-common"
 version = "0.1.0"
-source = "git+https://github.com/maxaudron/rp-hal?branch=rp2350-qfn80#f1514a0572d187753eac41bc84112ff8aab0b70a"
+source = "git+https://github.com/rp-rs/rp-hal#a8b9676849ea27de72cdf6c9841d76cd6b69b9f2"
 dependencies = [
  "fugit",
 ]
@@ -600,7 +600,7 @@ dependencies = [
 [[package]]
 name = "rp235x-hal"
 version = "0.4.0"
-source = "git+https://github.com/maxaudron/rp-hal?branch=rp2350-qfn80#f1514a0572d187753eac41bc84112ff8aab0b70a"
+source = "git+https://github.com/rp-rs/rp-hal#a8b9676849ea27de72cdf6c9841d76cd6b69b9f2"
 dependencies = [
  "bitfield 0.14.0",
  "cortex-m",
@@ -636,7 +636,7 @@ dependencies = [
 [[package]]
 name = "rp235x-hal-macros"
 version = "0.1.0"
-source = "git+https://github.com/maxaudron/rp-hal?branch=rp2350-qfn80#f1514a0572d187753eac41bc84112ff8aab0b70a"
+source = "git+https://github.com/rp-rs/rp-hal#a8b9676849ea27de72cdf6c9841d76cd6b69b9f2"
 dependencies = [
  "proc-macro2",
  "quote",

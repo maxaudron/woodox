@@ -11,7 +11,7 @@
 //!
 //! This design was chosen as it does not incure any additional performance cost.
 
-use defmt::debug;
+use defmt::{debug, trace};
 use usbd_human_interface_device::page::Keyboard;
 
 use crate::{
@@ -78,7 +78,8 @@ impl KeyboardState {
     }
 
     pub fn update(&mut self, scan: &ScanOrder) {
-        scan.scans.iter().flatten().for_each(|s| self.update_switch(s));
+        scan.debug_position();
+        scan.scans.iter().flatten().for_each(|s| self.update_keys(s));
     }
 
     pub fn clear_oneshot(&mut self) {
@@ -89,12 +90,13 @@ impl KeyboardState {
 
     /// Set keycode or clear keycode
     pub fn set_keycode(&mut self, state: SwitchState, keycode: Keyboard) {
-        if state.is_pressed() {
-            self.matrix[keycode as usize] = keycode;
-            debug!("key pressed: {:#X}", keycode as u8)
-        } else {
-            self.matrix[keycode as usize] = Keyboard::NoEventIndicated;
-            debug!("key released: {:#X}", keycode as u8)
+        let k = &mut self.matrix[keycode as usize];
+        if state.is_pressed() && *k == Keyboard::NoEventIndicated {
+            *k = keycode;
+            trace!("key pressed: {:#X}", keycode as u8)
+        } else if *k != Keyboard::NoEventIndicated {
+            *k = Keyboard::NoEventIndicated;
+            trace!("key released: {:#X}", keycode as u8)
         }
     }
 
@@ -120,9 +122,8 @@ impl KeyboardState {
         }
     }
 
-    fn update_switch(&mut self, s: super::Switch) {
+    fn update_keys(&mut self, s: super::Switch) {
         for check_layer in (0..(self.keymap.active_layer + 1)).rev() {
-            debug!("layer: {:?}", check_layer);
             match self.keymap.layers[check_layer][s.index] {
                 Key::Keycode(keycode) => {
                     self.set_keycode(s.state, keycode);
@@ -150,9 +151,9 @@ impl KeyboardState {
                     if self.matrix[Keyboard::LeftShift as usize] == Keyboard::LeftShift
                         || self.matrix[Keyboard::RightShift as usize] == Keyboard::RightShift
                     {
-                        self.set_keycode(SwitchState::Pressed, Keyboard::Grave);
+                        self.set_keycode(s.state, Keyboard::Grave);
                     } else {
-                        self.set_keycode(SwitchState::Pressed, Keyboard::Escape);
+                        self.set_keycode(s.state, Keyboard::Escape);
                     }
 
                     return;

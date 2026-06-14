@@ -1,6 +1,6 @@
 #![doc = include_str!("readme.md")]
 
-use defmt::Format;
+use defmt::{debug, Format};
 
 use crate::layout::*;
 
@@ -79,6 +79,56 @@ impl ScanOrder {
         });
 
         ScanOrder { scans }
+    }
+
+    pub fn debug_position(&self) {
+        debug!(
+            "{:03} {:03} {:03} {:03} {:03} {:03}",
+            self.scans[1].switches[0].position,
+            self.scans[0].switches[0].position,
+            self.scans[5].switches[0].position,
+            self.scans[7].switches[0].position,
+            self.scans[6].switches[0].position,
+            self.scans[4].switches[0].position,
+        );
+        debug!(
+            "{:03} {:03} {:03} {:03} {:03} {:03}",
+            self.scans[1].switches[1].position,
+            self.scans[0].switches[1].position,
+            self.scans[5].switches[1].position,
+            self.scans[7].switches[1].position,
+            self.scans[6].switches[1].position,
+            self.scans[4].switches[1].position,
+        );
+        debug!(
+            "{:03} {:03} {:03} {:03} {:03} {:03}",
+            self.scans[1].switches[2].position,
+            self.scans[0].switches[2].position,
+            self.scans[5].switches[2].position,
+            self.scans[7].switches[2].position,
+            self.scans[6].switches[2].position,
+            self.scans[4].switches[2].position,
+        );
+        debug!(
+            "{:03} {:03} {:03} {:03} {:03} {:03} {:03} {:03}",
+            self.scans[1].switches[3].position,
+            self.scans[0].switches[3].position,
+            self.scans[5].switches[3].position,
+            self.scans[7].switches[3].position,
+            self.scans[6].switches[3].position,
+            self.scans[4].switches[3].position,
+            self.scans[3].switches[0].position,
+            self.scans[3].switches[1].position,
+        );
+        debug!(
+            "  {:03}   {:03} {:03}   {:03}   {:03} {:03}",
+            self.scans[2].switches[0].position,
+            self.scans[2].switches[1].position,
+            self.scans[2].switches[2].position,
+            self.scans[2].switches[3].position,
+            self.scans[3].switches[3].position,
+            self.scans[3].switches[2].position,
+        );
     }
 }
 

@@ -2,11 +2,11 @@
 
 #[macro_export]
 macro_rules! switches {
-    {$($x:expr;$y:expr),+$(,)+} => {
+    {$($mux:expr;$channel:expr),+$(,)+} => {
         use $crate::matrix::Switch;
 
         pub const fn default_switches() -> [Switch; NUM_SWITCHES] {
-            [ $(Switch::new($x,$y)),+ ]
+            [ $(Switch::new($mux,$channel)),+ ]
         }
     };
 }
