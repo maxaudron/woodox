@@ -191,40 +191,23 @@ impl Keymap {
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//
-//     macro_rules! set_key {
-//         ($key:path) => {
-//             KEYBOARD[$key as usize] = $key;
-//         };
-//     }
-//
-//     macro_rules! clear_key {
-//         ($key:path) => {
-//             KEYBOARD[$key as usize] = Keyboard::NoEventIndicated;
-//         };
-//     }
-//
-//     macro_rules! assert_key {
-//         ( $map:path, $key:ident $(, $(mod $mod:ident),*)?) => {
-//             unsafe {
-//                 $($(set_key!(Keyboard::$mod);),*)?
-//                 KEYMAP.layers[0][0] = $map;
-//                 Keymap::set_key(0, true, false);
-//                 assert!(KEYBOARD[Keyboard::$key as usize] == Keyboard::$key);
-//                 Keymap::set_key(0, false, false);
-//                 KEYMAP.layers[0][0] = Key::Dead;
-//                 $($(clear_key!(Keyboard::$mod);),*)?
-//             }
-//         };
-//     }
-//
-//     #[test]
-//     fn key_grave_escape() {
-//         assert_key!(Key::GrvEsc, Escape);
-//         assert_key!(Key::GrvEsc, Grave, mod LeftShift);
-//         assert_key!(Key::GrvEsc, Grave, mod RightShift);
-//     }
-// }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn set_keycode_key_held() {
+        let mut state = KeyboardState::new();
+        let kcn = Keyboard::NoEventIndicated;
+        let kc = Keyboard::A;
+        let kcu = kc as usize;
+
+        assert_eq!(state.matrix[kcu], kcn);
+
+        state.set_keycode(SwitchState::Pressed, kc);
+        assert_eq!(state.matrix[kcu], kc);
+
+        state.set_keycode(SwitchState::Unpressed, kc);
+        assert_eq!(state.matrix[kcu], kcn);
+    }
+}
