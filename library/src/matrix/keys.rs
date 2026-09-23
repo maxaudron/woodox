@@ -11,7 +11,10 @@
 //!
 //! This design was chosen as it does not incure any additional performance cost.
 
-use crate::lg::{debug, trace};
+use crate::{
+    layout::NUM_KEY_POSITIONS,
+    lg::{debug, trace},
+};
 use usbd_human_interface_device::page::Keyboard;
 
 use crate::{
@@ -60,20 +63,19 @@ pub const NUM_KEYCODES: usize = 231 * 2;
 /// Represents the state of the keyboard report as send through
 /// USB and maps the physical switch states to the logical keymap
 pub struct KeyboardState {
-    pub matrix: [Keyboard; NUM_KEYCODES],
+    pub matrix: [Keyboard; NUM_KEY_POSITIONS * NUM_LAYERS],
     pub keymap: Keymap,
 }
 
 impl KeyboardState {
     pub fn new(keymap: Keymap) -> KeyboardState {
         KeyboardState {
-            matrix: [Keyboard::NoEventIndicated; NUM_KEYCODES],
+            matrix: [Keyboard::NoEventIndicated; NUM_KEY_POSITIONS * NUM_LAYERS],
             keymap,
         }
     }
 
     pub fn update(&mut self, scan: &ScanOrder) {
-        scan.debug_position();
         scan.scans.iter().flatten().for_each(|s| self.update_keys(s));
     }
 
@@ -84,8 +86,8 @@ impl KeyboardState {
     }
 
     /// Set keycode or clear keycode
-    pub fn set_keycode(&mut self, state: SwitchState, keycode: Keyboard) {
-        let k = &mut self.matrix[keycode as usize];
+    pub fn set_keycode(&mut self, index: usize, state: SwitchState, keycode: Keyboard) {
+        let k = &mut self.matrix[index];
         if state.is_pressed() && *k == Keyboard::NoEventIndicated {
             *k = keycode;
             trace!("key pressed: {:#X}", keycode as u8)
@@ -96,32 +98,33 @@ impl KeyboardState {
     }
 
     /// Activate a keycode to be active exactly once in the next USB HID Report.
-    pub fn set_oneshot_keycode(&mut self, keycode: Keyboard) {
-        self.matrix[keycode as usize + 231] = keycode;
+    pub fn set_oneshot_keycode(&mut self, index: usize, keycode: Keyboard) {
+        self.matrix[index] = keycode;
         debug!("oneshot key pressed: {:#X}", keycode as u8)
     }
 
-    /// Key actions if they are held.
-    ///
-    /// [`Keymap::set_key()`] is also run on held keys, so only keys that
-    /// have different handling when held rather than tapped are required
-    /// to be set here
-    pub fn set_hold(&mut self, key: usize, state: bool) {
-        debug!("hold: {:?} {:?}", key, state);
-        for check_layer in (0..(self.keymap.active_layer + 1)).rev() {
-            match self.keymap.layers[check_layer][key] {
-                Key::LayerTap(layer, _) => self.keymap.set_layer(SwitchState::Held, layer),
-                Key::KeyTap(keycode, _) => self.set_keycode(SwitchState::Held, keycode),
-                _ => continue,
-            }
-        }
-    }
+    // /// Key actions if they are held.
+    // ///
+    // /// [`Keymap::set_key()`] is also run on held keys, so only keys that
+    // /// have different handling when held rather than tapped are required
+    // /// to be set here
+    // pub fn set_hold(&mut self, key: usize, state: bool) {
+    //     debug!("hold: {:?} {:?}", key, state);
+    //     for check_layer in (0..(self.keymap.active_layer + 1)).rev() {
+    //         match self.keymap.layers[check_layer][key] {
+    //             Key::LayerTap(layer, _) => self.keymap.set_layer(SwitchState::Held, layer),
+    //             Key::KeyTap(keycode, _) => self.set_keycode(SwitchState::Held, keycode),
+    //             _ => continue,
+    //         }
+    //     }
+    // }
 
     fn update_keys(&mut self, s: super::Switch) {
         for check_layer in (0..(self.keymap.active_layer + 1)).rev() {
-            match self.keymap.layers[check_layer][s.index] {
+            let index = s.index * (check_layer + 1);
+            match self.keymap.layers[check_layer][index] {
                 Key::Keycode(keycode) => {
-                    self.set_keycode(s.state, keycode);
+                    self.set_keycode(index, s.state, keycode);
                     return;
                 }
                 Key::Layer(layer) => {
@@ -130,25 +133,25 @@ impl KeyboardState {
                 }
                 Key::LayerTap(_, keycode) => {
                     if s.state.is_oneshot() {
-                        self.set_oneshot_keycode(keycode);
+                        self.set_oneshot_keycode(index, keycode);
                     }
 
                     return;
                 }
                 Key::KeyTap(_, keycode) => {
                     if s.state.is_oneshot() {
-                        self.set_oneshot_keycode(keycode);
+                        self.set_oneshot_keycode(index, keycode);
                     }
 
                     return;
                 }
                 Key::GrvEsc => {
-                    if self.matrix[Keyboard::LeftShift as usize] == Keyboard::LeftShift
-                        || self.matrix[Keyboard::RightShift as usize] == Keyboard::RightShift
+                    if self.matrix.contains(&Keyboard::LeftShift)
+                        || self.matrix.contains(&Keyboard::RightShift)
                     {
-                        self.set_keycode(s.state, Keyboard::Grave);
+                        self.set_keycode(index, s.state, Keyboard::Grave);
                     } else {
-                        self.set_keycode(s.state, Keyboard::Escape);
+                        self.set_keycode(index, s.state, Keyboard::Escape);
                     }
 
                     return;
@@ -195,14 +198,14 @@ mod tests {
         let mut state = KeyboardState::new(Keymap::default());
         let kcn = Keyboard::NoEventIndicated;
         let kc = Keyboard::A;
-        let kcu = kc as usize;
+        let kcu = 0;
 
         assert_eq!(state.matrix[kcu], kcn);
 
-        state.set_keycode(SwitchState::Pressed, kc);
+        state.set_keycode(kcu, SwitchState::Pressed, kc);
         assert_eq!(state.matrix[kcu], kc);
 
-        state.set_keycode(SwitchState::Unpressed, kc);
+        state.set_keycode(kcu, SwitchState::Unpressed, kc);
         assert_eq!(state.matrix[kcu], kcn);
     }
 }

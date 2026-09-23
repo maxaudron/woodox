@@ -2,6 +2,10 @@
 pub const NUM_MUX: usize = 4;
 /// Total number of switches
 pub const NUM_SWITCHES: usize = 32;
+
+/// Total number of key positions, over all halfs / accessories
+pub const NUM_KEY_POSITIONS: usize = NUM_SWITCHES * 2;
+
 /// Number of scans needed to scan all switches
 ///
 /// This depends on the number of mux and number of switches.
