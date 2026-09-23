@@ -89,7 +89,7 @@ impl KeyboardState {
         if state.is_pressed() && *k == Keyboard::NoEventIndicated {
             *k = keycode;
             trace!("key pressed: {:#X}", keycode as u8)
-        } else if *k != Keyboard::NoEventIndicated {
+        } else if !state.is_pressed() && *k != Keyboard::NoEventIndicated {
             *k = Keyboard::NoEventIndicated;
             trace!("key released: {:#X}", keycode as u8)
         }

@@ -11,11 +11,11 @@ pub mod left {
 
     keymap! {
         0 = layer! [
-            GrvEsc,         Key(Keyboard1), Key(Keyboard2), Key(Keyboard3), Key(Keyboard4), Key(Keyboard5),
-            Key(Tab),       Key(Q), Key(W), Key(R), Key(T), Key(Y),
-            Key(LeftControl),  Key(A), Key(S), Key(D), Key(F), Key(G),
-            Key(LeftShift), Key(Z), Key(X), Key(C), Key(V), Key(B), Key(B), Key(B),
-            LayerTap(1, L),     Key(F), Key(G),     Key(LeftShift), Key(Space), Key(DeleteBackspace),
+            GrvEsc,             Key(Keyboard1), Key(Keyboard2), Key(Keyboard3), Key(Keyboard4), Key(Keyboard5),
+            Key(Tab),           Key(Q),         Key(W),         Key(R),         Key(T),         Key(Y),
+            Key(LeftControl),   Key(A),         Key(S),         Key(D),         Key(F),         Key(G),
+            Key(LeftShift),     Key(Z),         Key(X),         Key(C),         Key(V),         Key(B), Key(B), Key(B),
+            LayerTap(1, L),            Key(F),           Key(G),         Key(LeftShift),                Key(Space), Key(DeleteBackspace),
         ];
         1 = layer! [
             GrvEsc,         Key(Keyboard1), Key(Keyboard2), Key(Keyboard3), Key(Keyboard4), Key(Keyboard5),

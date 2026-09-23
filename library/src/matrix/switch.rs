@@ -1,5 +1,6 @@
 #[cfg(not(test))]
 use defmt::Format;
+use crate::lg::trace;
 
 use crate::layout::{CALIBRATION_SAMPLES, HOLD_TIME};
 
@@ -139,8 +140,10 @@ impl Switch {
     #[inline(always)]
     pub fn pressed(&mut self, rapid: bool) {
         if rapid {
+            trace!("switch {}:{} rapid pressed", self.mux, self.channel);
             self.state = SwitchState::RapidPressed
         } else {
+            trace!("switch {}:{} pressed", self.mux, self.channel);
             self.state = SwitchState::Pressed
         }
 
@@ -150,8 +153,10 @@ impl Switch {
     #[inline(always)]
     pub fn released(&mut self, rapid: bool) {
         if rapid && self.position > self.trig_press {
+            trace!("switch {}:{} rapid released", self.mux, self.channel);
             self.state = SwitchState::RapidUnpressed
         } else {
+            trace!("switch {}:{} released", self.mux, self.channel);
             self.state = SwitchState::Unpressed
         }
 
@@ -165,6 +170,7 @@ impl Switch {
             // Switch has been in pressed state long enough so we switch to held
             self.hold_counter = 0;
             self.state = SwitchState::Held;
+            trace!("switch {}:{} held", self.mux, self.channel);
         } else {
             // We keep incrementing the hold counter every cycle
             self.hold_counter += 1;
