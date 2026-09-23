@@ -51,10 +51,10 @@
           toolchain =
             with fenix.packages.${system};
             combine [
-              stable.toolchain
-              targets.thumbv6m-none-eabi.stable.rust-std
-              targets."thumbv8m.main-none-eabihf".stable.rust-std
-              targets.riscv32imac-unknown-none-elf.stable.rust-std
+              latest.toolchain
+              targets.thumbv6m-none-eabi.latest.rust-std
+              targets."thumbv8m.main-none-eabihf".latest.rust-std
+              targets.riscv32imac-unknown-none-elf.latest.rust-std
             ];
 
           craneLib = (crane.mkLib pkgs).overrideToolchain toolchain;

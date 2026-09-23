@@ -15,7 +15,7 @@ use defmt::{debug, trace};
 use usbd_human_interface_device::page::Keyboard;
 
 use crate::{
-    layout::{default_keymap, NUM_SWITCHES},
+    layout::NUM_SWITCHES,
     matrix::{ScanOrder, SwitchState},
 };
 
@@ -63,17 +63,12 @@ pub struct KeyboardState {
     pub matrix: [Keyboard; NUM_KEYCODES],
     pub keymap: Keymap,
 }
-impl Default for KeyboardState {
-    fn default() -> Self {
-        Self::new()
-    }
-}
 
 impl KeyboardState {
-    pub fn new() -> KeyboardState {
+    pub fn new(keymap: Keymap) -> KeyboardState {
         KeyboardState {
             matrix: [Keyboard::NoEventIndicated; NUM_KEYCODES],
-            keymap: default_keymap(),
+            keymap,
         }
     }
 
@@ -197,7 +192,7 @@ mod tests {
 
     #[test]
     fn set_keycode_key_held() {
-        let mut state = KeyboardState::new();
+        let mut state = KeyboardState::new(Keymap::default());
         let kcn = Keyboard::NoEventIndicated;
         let kc = Keyboard::A;
         let kcu = kc as usize;

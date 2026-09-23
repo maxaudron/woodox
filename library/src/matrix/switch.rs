@@ -109,7 +109,7 @@ impl Switch {
             rapid_last_position: 0,
             rapid_lower: 4,
             rapid_upper: 4,
-            offset: 0,
+            offset: 32,
             index: 0,
             hold_counter: 0,
 
@@ -121,7 +121,8 @@ impl Switch {
     /// switch defined offset
     #[inline(always)]
     pub fn value(&mut self, value: u8) -> u8 {
-        super::hall::distance_travel(value)
+        let distance = super::hall::distance_travel(value);
+        distance.saturating_sub(self.offset)
     }
 
     #[inline(always)]

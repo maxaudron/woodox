@@ -1,9 +1,6 @@
 use defmt::{debug, error, info, trace, warn};
 
-use woodox_lib::{
-    layout::default_switches,
-    matrix::{KeyboardState, ScanOrder},
-};
+use woodox_lib::matrix::{KeyboardState, ScanOrder};
 
 use crate::{
     hal::{
@@ -46,8 +43,15 @@ impl<'a> ScanState<'a> {
         mut dma: Channel<CH0>,
         fifo: AdcFifo<'a, u8>,
         timer: Timer<CopyableTimer0>,
+        handedness: bool,
     ) -> Self {
         dma.enable_irq0();
+
+        let switches = if handedness {
+            crate::layout::right::switches()
+        } else {
+            crate::layout::left::switches()
+        };
 
         Self {
             mux,
@@ -56,7 +60,7 @@ impl<'a> ScanState<'a> {
 
             channel: 0,
             buf: Some(singleton!(: [u8; BUFFER] = [255; BUFFER]).unwrap()),
-            scan: ScanOrder::new(default_switches()),
+            scan: ScanOrder::new(switches),
             transfer: None,
             timer,
 

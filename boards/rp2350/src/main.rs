@@ -10,6 +10,7 @@ use defmt_rtt as _;
 mod hardware;
 mod scan;
 mod usb;
+mod layout;
 
 /// Tell the Boot ROM about our application
 #[unsafe(link_section = ".start_block")]
@@ -29,9 +30,10 @@ mod app {
             dma::DMAExt,
             timer::{Alarm, Alarm0, CopyableTimer0},
             usb::UsbBus,
-        }, scan::ScanState, usb::Usb
+        }, scan::ScanState, usb::Usb, layout
     };
     use defmt::info;
+    use embedded_hal::digital::InputPin;
     use fugit::MicrosDurationU32;
     use usb_device::bus::UsbBusAllocator;
     use woodox_lib::matrix::KeyboardState;
@@ -109,6 +111,8 @@ mod app {
         let adc_pin_2 = AdcPin::new(pins.mux3_com.into_floating_input()).unwrap();
         let adc_pin_3 = AdcPin::new(pins.mux4_com.into_floating_input()).unwrap();
 
+        let handedness = pins.handedness.into_floating_input().is_high().unwrap();
+
         let fifo = adc
             .build_fifo()
             .round_robin((&adc_pin_0, &adc_pin_1, &adc_pin_2, &adc_pin_3))
@@ -116,7 +120,7 @@ mod app {
             .shift_8bit()
             .enable_dma()
             .start_paused();
-        let scan = ScanState::new(mux, dma.ch0, fifo, timer);
+        let scan = ScanState::new(mux, dma.ch0, fifo, timer, handedness);
 
         info!("adc initialization finished");
 
@@ -135,7 +139,14 @@ mod app {
         alarm.enable_interrupt();
         alarm.schedule(MicrosDurationU32::Hz(1000)).unwrap();
 
-        let keys = KeyboardState::new();
+        let keys = if handedness {
+            /// Right Hand
+            KeyboardState::new(layout::right::keymap())
+        } else {
+            /// Left Hand
+            KeyboardState::new(layout::left::keymap())
+        };
+
 
         (Shared { keys, scan, usb, alarm }, Local {})
     }
@@ -179,6 +190,7 @@ hal::bsp_pins!(
     Gpio5 { name: i2c_sdl },
     Gpio6 { name: i2c_sda_acc },
     Gpio7 { name: i2c_sdl_acc },
+    Gpio8 { name: handedness },
 );
 
 /// Program metadata for `picotool info`

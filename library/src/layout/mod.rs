@@ -3,9 +3,9 @@
 #[macro_export]
 macro_rules! switches {
     {$($mux:expr;$channel:expr),+$(,)+} => {
-        use $crate::matrix::Switch;
+        use $crate::{matrix::Switch, layout::NUM_SWITCHES};
 
-        pub const fn default_switches() -> [Switch; NUM_SWITCHES] {
+        pub const fn switches() -> [Switch; NUM_SWITCHES] {
             [ $(Switch::new($mux,$channel)),+ ]
         }
     };
@@ -17,7 +17,7 @@ macro_rules! keymap {
         use usbd_human_interface_device::page::Keyboard;
         use $crate::matrix::{Keymap, Key};
 
-        pub const fn default_keymap() -> Keymap {
+        pub const fn keymap() -> Keymap {
             let mut keymap = Keymap::default();
 
             $(keymap.layers[$n] = $layer;)+
