@@ -11,7 +11,7 @@
 //!
 //! This design was chosen as it does not incure any additional performance cost.
 
-use defmt::{debug, trace};
+use crate::lg::{debug, trace};
 use usbd_human_interface_device::page::Keyboard;
 
 use crate::{

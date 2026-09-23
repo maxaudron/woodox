@@ -140,13 +140,12 @@ mod app {
         alarm.schedule(MicrosDurationU32::Hz(1000)).unwrap();
 
         let keys = if handedness {
-            /// Right Hand
+            // Right Hand
             KeyboardState::new(layout::right::keymap())
         } else {
-            /// Left Hand
+            // Left Hand
             KeyboardState::new(layout::left::keymap())
         };
-
 
         (Shared { keys, scan, usb, alarm }, Local {})
     }

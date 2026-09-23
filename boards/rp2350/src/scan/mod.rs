@@ -35,6 +35,9 @@ pub struct ScanState<'a> {
 
     timer: Timer<CopyableTimer0>,
     counter: Instant,
+
+    /// counter for initial calibration of offsets
+    calibration: u8,
 }
 
 impl<'a> ScanState<'a> {
@@ -65,6 +68,8 @@ impl<'a> ScanState<'a> {
             timer,
 
             counter: Instant::from_ticks(0),
+
+            calibration: 1,
         }
     }
 
@@ -113,12 +118,19 @@ impl<'a> ScanState<'a> {
         if self.channel < (NUM_CHANNELS as u8) {
             self.scan_one();
         } else {
+            // we have complete one full scan cycle
             info!(
                 "scan round took: {}μs",
                 (self.timer.get_counter() - self.counter).to_micros()
             );
             trace!("stopping scan round on channel {}", self.channel);
-            keys.update(&self.scan);
+
+            if self.calibration < CALIBRATION_SAMPLES + 1 {
+                self.scan.calibrate(self.calibration);
+                self.calibration += 1;
+            } else {
+                keys.update(&self.scan);
+            }
         }
     }
 

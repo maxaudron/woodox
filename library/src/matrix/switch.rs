@@ -1,8 +1,10 @@
+#[cfg(not(test))]
 use defmt::Format;
 
-use crate::layout::HOLD_TIME;
+use crate::layout::{CALIBRATION_SAMPLES, HOLD_TIME};
 
-#[derive(Debug, Default, Format, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[cfg_attr(not(test), derive(Format))]
 pub enum SwitchState {
     Pressed,
     #[default]
@@ -32,7 +34,8 @@ impl SwitchState {
 }
 
 /// A single switch in our keyboard
-#[derive(Debug, Format, Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
+#[cfg_attr(not(test), derive(Format))]
 pub struct Switch {
     /// Switch position in units of 0.1mm
     pub position: u8,
@@ -57,6 +60,8 @@ pub struct Switch {
 
     /// individual position correction
     pub offset: u8,
+    /// calibration is done
+    pub calibrated: bool,
 
     /// ID of the mux this switch is attached to
     pub mux: u8,
@@ -81,6 +86,7 @@ impl Default for Switch {
             rapid_upper: 4,
 
             offset: 26,
+            calibrated: false,
 
             mux: 0,
             channel: 0,
@@ -109,7 +115,8 @@ impl Switch {
             rapid_last_position: 0,
             rapid_lower: 4,
             rapid_upper: 4,
-            offset: 32,
+            offset: 0,
+            calibrated: false,
             index: 0,
             hold_counter: 0,
 
@@ -122,7 +129,11 @@ impl Switch {
     #[inline(always)]
     pub fn value(&mut self, value: u8) -> u8 {
         let distance = super::hall::distance_travel(value);
-        distance.saturating_sub(self.offset)
+        if self.calibrated {
+            distance.saturating_sub(self.offset)
+        } else {
+            distance
+        }
     }
 
     #[inline(always)]
@@ -204,6 +215,13 @@ impl Switch {
     pub fn update_raw(&mut self, value: u8) {
         let travel = self.value(value);
         self.update(travel);
+    }
+
+    pub fn calibrate(&mut self, count: u8) {
+        self.offset += (self.position.saturating_sub(self.offset)) / count;
+        if count == CALIBRATION_SAMPLES {
+            self.calibrated = true;
+        }
     }
 }
 
@@ -751,5 +769,33 @@ mod tests {
         assert_eq!(s.value(248), 0); // distance(248) = 26, comp = 26 -> 0
         s.offset = 27;
         let _ = s.value(248); // 26 - 27 underflows
+    }
+
+    #[test]
+    fn calibration() {
+        let mut s = default_switch();
+        s.offset = 0;
+
+        s.update_raw(81);
+        s.position = 30;
+        s.calibrate(1);
+
+        assert_eq!(s.offset, 30);
+
+        s.update_raw(84);
+        s.calibrate(2);
+
+        assert_eq!(s.offset, 31);
+
+        s.update_raw(86);
+        s.calibrate(3);
+
+        assert_eq!(s.offset, 32);
+
+        s.update_raw(86);
+        s.calibrate(4);
+
+        assert_eq!(s.offset, 32);
+        assert!(s.calibrated)
     }
 }

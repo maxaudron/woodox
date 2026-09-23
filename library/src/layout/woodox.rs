@@ -17,6 +17,7 @@ pub const NUM_CHANNELS: usize = NUM_SWITCHES / NUM_MUX;
 pub const HOLD_TIME: u32 = 8000;
 
 pub const SAMPLES: usize = 4;
+pub const CALIBRATION_SAMPLES: u8 = 4;
 
 // switches! {
 //     0;1, 0;0, 0;5, 0;7, 0;6, 0;4,

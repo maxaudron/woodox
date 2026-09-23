@@ -1,6 +1,9 @@
 #![doc = include_str!("readme.md")]
 
-use defmt::{debug, Format};
+#[cfg(not(test))]
+use defmt::Format;
+
+use crate::lg::debug;
 
 use crate::layout::*;
 
@@ -16,7 +19,8 @@ pub use switch::*;
 ///
 /// The rp2040 ADC for example has an internal 4 pin mux that allows it
 /// to read multiple values from the ADC in quick succession.
-#[derive(Default, Debug, Format, Copy, Clone)]
+#[derive(Default, Debug, Copy, Clone)]
+#[cfg_attr(not(test), derive(Format))]
 pub struct Scan {
     pub switches: [Switch; NUM_MUX],
 }
@@ -33,6 +37,10 @@ impl Scan {
             .iter_mut()
             .zip(values)
             .for_each(|(switch, value)| switch.update_raw(value))
+    }
+
+    pub fn calibrate(&mut self, count: u8) {
+        self.switches.iter_mut().for_each(|s| s.calibrate(count));
     }
 }
 
@@ -63,7 +71,8 @@ impl IntoIterator for &Scan {
 /// an exact position in our [`Layer`]
 ///
 /// [`Layer`]: crate::matrix::Layer
-#[derive(Default, Debug, Format, Copy, Clone)]
+#[derive(Default, Debug, Copy, Clone)]
+#[cfg_attr(not(test), derive(Format))]
 pub struct ScanOrder {
     pub scans: [Scan; NUM_CHANNELS],
 }
@@ -79,6 +88,11 @@ impl ScanOrder {
         });
 
         ScanOrder { scans }
+    }
+
+    /// Takes the current position values and uses them as base offset
+    pub fn calibrate(&mut self, count: u8) {
+        self.scans.iter_mut().for_each(|s| s.calibrate(count));
     }
 
     pub fn debug_position(&self) {
