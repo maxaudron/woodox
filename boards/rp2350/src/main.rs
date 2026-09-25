@@ -3,14 +3,16 @@
 
 use rp235x_hal as hal;
 
+use defmt_rtt as _;
 #[cfg(all(target_arch = "arm", target_os = "none"))]
 use panic_probe as _;
-use defmt_rtt as _;
 
 mod hardware;
-mod scan;
-mod usb;
+mod i2c;
 mod layout;
+mod scan;
+mod uart;
+mod usb;
 
 /// Tell the Boot ROM about our application
 #[unsafe(link_section = ".start_block")]
@@ -24,19 +26,29 @@ const XTAL_FREQ_HZ: u32 = 12_000_000u32;
 #[rtic::app(device = crate::hal::pac)]
 mod app {
     use crate::{
-        Pins, hal::{
+        Pins,
+        hal::{
             self, Adc,
             adc::AdcPin,
             dma::DMAExt,
             timer::{Alarm, Alarm0, CopyableTimer0},
             usb::UsbBus,
-        }, scan::ScanState, usb::Usb, layout
+        },
+        layout,
+        scan::ScanState,
+        uart::{Message, Uart, UartRole},
+        usb::Usb,
     };
     use defmt::info;
     use embedded_hal::digital::InputPin;
     use fugit::MicrosDurationU32;
-    use usb_device::bus::UsbBusAllocator;
-    use woodox_lib::matrix::KeyboardState;
+    use rp235x_hal::Clock;
+    use usb_device::{bus::UsbBusAllocator, device::UsbDeviceState};
+    use usbd_human_interface_device::page::Keyboard;
+    use woodox_lib::{
+        layout::NUM_SWITCHES,
+        matrix::{KeyboardState, NUM_LAYERS},
+    };
 
     #[shared]
     struct Shared {
@@ -47,6 +59,8 @@ mod app {
         #[lock_free]
         usb: Usb<UsbBus>,
         #[lock_free]
+        uart: Uart,
+        #[lock_free]
         alarm: Alarm0<CopyableTimer0>,
     }
 
@@ -54,7 +68,7 @@ mod app {
     struct Local {}
 
     #[init(local = [
-        adc: Option<hal::Adc> = None, 
+        adc: Option<hal::Adc> = None,
         usb: Option<UsbBusAllocator<UsbBus>> = None,
     ])]
     fn init(c: init::Context) -> (Shared, Local) {
@@ -86,7 +100,12 @@ mod app {
 
         let mut timer = hal::Timer::new_timer0(c.device.TIMER0, &mut resets, &clocks);
 
-        let pins = Pins::new(c.device.IO_BANK0, c.device.PADS_BANK0, sio.gpio_bank0, &mut resets);
+        let pins = Pins::new(
+            c.device.IO_BANK0,
+            c.device.PADS_BANK0,
+            sio.gpio_bank0,
+            &mut resets,
+        );
 
         info!("core initialization finished");
 
@@ -135,22 +154,41 @@ mod app {
         let usb_bus = c.local.usb.as_mut().unwrap();
         let usb = Usb::new(usb_bus);
 
+        let uart_pins = (pins.i2c_sda.into_function(), pins.i2c_sdl.into_function());
+        let uart = Uart::new(
+            uart_pins,
+            &mut resets,
+            c.device.UART1,
+            clocks.peripheral_clock.freq(),
+        );
+
         let mut alarm = timer.alarm_0().unwrap();
         alarm.enable_interrupt();
         alarm.schedule(MicrosDurationU32::Hz(1000)).unwrap();
 
         let keys = if handedness {
             // Right Hand
+            info!("handedness: right");
             KeyboardState::new(layout::right::keymap())
         } else {
             // Left Hand
+            info!("handedness: left");
             KeyboardState::new(layout::left::keymap())
         };
 
-        (Shared { keys, scan, usb, alarm }, Local {})
+        (
+            Shared {
+                keys,
+                scan,
+                usb,
+                uart,
+                alarm,
+            },
+            Local {},
+        )
     }
 
-    #[task(binds = TIMER0_IRQ_0, shared = [keys, scan, usb, alarm])]
+    #[task(binds = TIMER0_IRQ_0, shared = [keys, scan, usb, alarm, uart])]
     fn usb_timer_alarm(cx: usb_timer_alarm::Context) {
         // Schedule next USB interrupt instantly
         cx.shared.alarm.clear_interrupt();
@@ -160,13 +198,30 @@ mod app {
         // this should be fixed timing smaller than the USB timer period
         // so complete before the next IRQ
         cx.shared.scan.scan();
-        cx.shared.usb.tick(cx.shared.keys);
+
+        cx.shared.usb.tick(cx.shared.keys, cx.shared.uart);
     }
 
-    #[task(binds = DMA_IRQ_0, shared = [keys, scan])]
+    #[task(binds = UART1_IRQ, shared = [keys, uart])]
+    fn uart_alarm(cx: uart_alarm::Context) {
+        cx.shared.uart.intr(cx.shared.keys);
+        cx.shared.uart.uart.clear_rx_interrupt()
+    }
+
+    #[task(binds = DMA_IRQ_0, shared = [keys, scan, uart])]
     fn scan_dma_completion(cx: scan_dma_completion::Context) {
         let scan = cx.shared.scan;
-        scan.dma_completion(cx.shared.keys);
+
+        if cx.shared.uart.role == UartRole::Secondary {
+            scan.dma_completion(cx.shared.keys, |ev| match ev {
+                woodox_lib::matrix::KeyboardEvent::Keycode(idx, layer, key) => {
+                    cx.shared.uart.send(Message::Keycode((idx, layer, key)))
+                }
+                woodox_lib::matrix::KeyboardEvent::Layer(layer) => cx.shared.uart.send(Message::Layer(layer)),
+            });
+        } else {
+            scan.dma_completion(cx.shared.keys, |ev| {});
+        };
     }
 }
 

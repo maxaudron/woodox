@@ -16,13 +16,14 @@ defmt = "1"
 defmt-rtt = "1"
 panic-probe = { version = "1", features = ["print-defmt"] }
 
-usbd-human-interface-device = "0.6"
-usb-device = "0"
+usbd-human-interface-device = { version = "0.6", features = ["defmt"] }
+usb-device = { version = "0", features = ["defmt"] }
 fugit = "0.3.9"
 frunk_core = { version = "0.4", default-features = false }
 packed_struct = { version = "0", default-features = false }
 
-rp235x-hal = { git = "https://github.com/rp-rs/rp-hal", features = ["binary-info", "critical-section-impl", "rt", "defmt", "qfn80"] }
+# rp235x-hal = { git = "https://github.com/rp-rs/rp-hal", features = ["binary-info", "critical-section-impl", "rt", "defmt", "qfn80"] }
+rp235x-hal = { path = "/home/audron/repo/github.com/maxaudron/rp-hal/rp235x-hal", features = ["binary-info", "critical-section-impl", "rt", "defmt", "qfn80"] }
 
 # ws2812-pio = "0.9"
 # smart-leds = "0.4"

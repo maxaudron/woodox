@@ -67,6 +67,11 @@ pub struct KeyboardState {
     pub keymap: Keymap,
 }
 
+pub enum KeyboardEvent {
+    Keycode(u8, u8, Keyboard),
+    Layer(u8),
+}
+
 impl KeyboardState {
     pub fn new(keymap: Keymap) -> KeyboardState {
         KeyboardState {
@@ -75,8 +80,11 @@ impl KeyboardState {
         }
     }
 
-    pub fn update(&mut self, scan: &ScanOrder) {
-        scan.scans.iter().flatten().for_each(|s| self.update_keys(s));
+    pub fn update(&mut self, scan: &ScanOrder, mut hook: impl FnMut(KeyboardEvent)) {
+        scan.scans
+            .iter()
+            .flatten()
+            .for_each(|s| self.update_keys(s, &mut hook));
     }
 
     pub fn clear_oneshot(&mut self) {
@@ -86,14 +94,23 @@ impl KeyboardState {
     }
 
     /// Set keycode or clear keycode
-    pub fn set_keycode(&mut self, index: usize, state: SwitchState, keycode: Keyboard) {
-        let k = &mut self.matrix[index];
+    pub fn set_keycode(
+        &mut self,
+        index: usize,
+        layer: usize,
+        state: SwitchState,
+        keycode: Keyboard,
+        hook: &mut impl FnMut(KeyboardEvent),
+    ) {
+        let k = &mut self.matrix[index * layer];
         if state.is_pressed() && *k == Keyboard::NoEventIndicated {
             *k = keycode;
-            trace!("key pressed: {:#X}", keycode as u8)
+            debug!("key pressed: {}:{} {:#X}", index, layer, keycode);
+            hook(KeyboardEvent::Keycode(index as u8, layer as u8, keycode));
         } else if !state.is_pressed() && *k != Keyboard::NoEventIndicated {
             *k = Keyboard::NoEventIndicated;
-            trace!("key released: {:#X}", keycode as u8)
+            debug!("key released: {}:{} {:#X}", index, layer, keycode);
+            hook(KeyboardEvent::Keycode(index as u8, layer as u8, Keyboard::NoEventIndicated));
         }
     }
 
@@ -119,16 +136,17 @@ impl KeyboardState {
     //     }
     // }
 
-    fn update_keys(&mut self, s: super::Switch) {
+    fn update_keys(&mut self, s: super::Switch, hook: &mut impl FnMut(KeyboardEvent)) {
         for check_layer in (0..(self.keymap.active_layer + 1)).rev() {
             let index = s.index * (check_layer + 1);
+            let layer = check_layer + 1;
             match self.keymap.layers[check_layer][index] {
                 Key::Keycode(keycode) => {
-                    self.set_keycode(index, s.state, keycode);
+                    self.set_keycode(index, layer, s.state, keycode, hook);
                     return;
                 }
-                Key::Layer(layer) => {
-                    self.keymap.set_layer(s.state, layer);
+                Key::Layer(set_layer) => {
+                    self.keymap.set_layer(s.state, set_layer, hook);
                     return;
                 }
                 Key::LayerTap(_, keycode) => {
@@ -149,9 +167,9 @@ impl KeyboardState {
                     if self.matrix.contains(&Keyboard::LeftShift)
                         || self.matrix.contains(&Keyboard::RightShift)
                     {
-                        self.set_keycode(index, s.state, Keyboard::Grave);
+                        self.set_keycode(index, layer, s.state, Keyboard::Grave, hook);
                     } else {
-                        self.set_keycode(index, s.state, Keyboard::Escape);
+                        self.set_keycode(index, layer, s.state, Keyboard::Escape, hook);
                     }
 
                     return;
@@ -178,13 +196,15 @@ impl Keymap {
     }
 
     /// Set `layer` active or inactive based on `state`
-    pub fn set_layer(&mut self, state: SwitchState, layer: usize) {
+    pub fn set_layer(&mut self, state: SwitchState, layer: usize, hook: &mut impl FnMut(KeyboardEvent)) {
         if state.is_pressed() {
             self.active_layer = layer;
-            debug!("layer activated: {:?}", layer)
+            debug!("layer activated: {:?}", layer);
+            hook(KeyboardEvent::Layer(layer as u8))
         } else {
             self.active_layer = 0;
-            debug!("layer deactivated: {:?}", layer)
+            debug!("layer deactivated: {:?}", layer);
+            hook(KeyboardEvent::Layer(0))
         }
     }
 }
@@ -202,10 +222,10 @@ mod tests {
 
         assert_eq!(state.matrix[kcu], kcn);
 
-        state.set_keycode(kcu, SwitchState::Pressed, kc);
+        state.set_keycode(kcu, 0, SwitchState::Pressed, kc, &mut |_| {});
         assert_eq!(state.matrix[kcu], kc);
 
-        state.set_keycode(kcu, SwitchState::Unpressed, kc);
+        state.set_keycode(kcu, 0, SwitchState::Unpressed, kc, &mut |_| {});
         assert_eq!(state.matrix[kcu], kcn);
     }
 }

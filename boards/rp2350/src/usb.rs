@@ -1,4 +1,4 @@
-use defmt::{debug, info};
+use defmt::{Format, debug, info};
 
 use usb_device::class_prelude::*;
 use usb_device::prelude::*;
@@ -11,12 +11,26 @@ use frunk_core::hlist::{HCons, HNil};
 
 use woodox_lib::matrix::KeyboardState;
 
+use crate::uart;
+use crate::uart::Uart;
+use crate::uart::UartRole;
+
 pub struct Usb<U>
 where
     U: UsbBus + Sized + 'static,
 {
     hid: UsbHidClass<'static, U, HCons<NKROBootKeyboard<'static, U>, HNil>>,
     dev: UsbDevice<'static, U>,
+    pub initialized: UsbState,
+    init_ticks: usize,
+}
+
+#[derive(Debug, Clone, Format, PartialEq, Eq, PartialOrd, Ord)]
+#[repr(u8)]
+pub enum UsbState {
+    Initializing,
+    Connected,
+    Disconnected,
 }
 
 impl<U> Usb<U>
@@ -36,21 +50,50 @@ where
             .unwrap()
             .build();
 
-        info!("usb initialized");
-
-        Self { hid, dev }
+        Self {
+            hid,
+            dev,
+            initialized: UsbState::Initializing,
+            init_ticks: 0,
+        }
     }
 
-    pub fn tick(&mut self, keys: &mut KeyboardState) {
+    pub fn state(&self) -> UsbDeviceState {
+        self.dev.state()
+    }
+
+    pub fn tick(&mut self, keys: &mut KeyboardState, uart: &mut Uart) {
+        match self.initialized {
+            UsbState::Initializing => {
+                if self.state() == UsbDeviceState::Configured {
+                    info!("usb controller initialized");
+                    self.initialized = UsbState::Connected;
+                    uart.send(uart::Message::Init(UartRole::Primary));
+                } else if self.init_ticks < 2000 {
+                    self.init_ticks += 1;
+                    if (self.init_ticks % 100) == 0 {
+                        info!("usb controller not initialized yet: {:?}", self.state());
+                    }
+                } else {
+                    info!("usb could not connect: {:?}", self.state());
+                    self.initialized = UsbState::Disconnected;
+                    uart.send(uart::Message::Init(UartRole::Secondary));
+                    return;
+                }
+            }
+            UsbState::Connected => (),
+            UsbState::Disconnected => return,
+        }
+
         match self.hid.device().write_report(keys.matrix) {
             Err(UsbHidError::WouldBlock) => {
-                info!("usb would block")
+                // info!("usb would block")
             }
             Err(UsbHidError::Duplicate) => {
-                info!("usb duplicate")
+                // info!("usb duplicate")
             }
             Ok(_) => {
-                info!("usb write ok")
+                // info!("usb write ok")
             }
             Err(e) => {
                 core::panic!("Failed to write keyboard report: {:?}", e)

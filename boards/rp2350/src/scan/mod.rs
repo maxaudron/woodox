@@ -1,6 +1,6 @@
 use defmt::{debug, error, info, trace, warn};
 
-use woodox_lib::matrix::{KeyboardState, ScanOrder};
+use woodox_lib::matrix::{KeyboardEvent, KeyboardState, ScanOrder};
 
 use crate::{
     hal::{
@@ -29,7 +29,7 @@ pub struct ScanState<'a> {
     fifo: AdcFifo<'a, u8>,
 
     channel: u8,
-    scan: ScanOrder,
+    pub scan: ScanOrder,
     buf: Option<&'static mut [u8; BUFFER]>,
     transfer: Option<Transfer<Channel<CH0>, DmaReadTarget<u8>, &'static mut [u8; BUFFER]>>,
 
@@ -85,13 +85,13 @@ impl<'a> ScanState<'a> {
     }
 
     /// Triggered by DMA_IRQ_0 interrupt
-    pub fn dma_completion(&mut self, keys: &mut KeyboardState) {
+    pub fn dma_completion(&mut self, keys: &mut KeyboardState, hook: impl FnMut(KeyboardEvent)) {
         trace!("completed dma transfer for channel: {}", self.channel);
         self.fifo.pause();
         if let Some(transfer) = self.transfer.take() {
             let (mut ch, _target, buf) = transfer.wait();
             let irq = ch.check_irq0();
-            debug!("dma ch irq {}", irq);
+            trace!("dma ch irq {}", irq);
 
             let res = buf
                 .iter()
@@ -103,7 +103,7 @@ impl<'a> ScanState<'a> {
                 .map(|s| (s / SAMPLES as u16) as u8);
 
             // Update the switch state and runs switch.update() for each switch
-            defmt::debug!("{}: {}", self.channel, res);
+            trace!("{}: {}", self.channel, res);
             self.scan.scans[self.channel as usize].update(res);
             trace!("completed update for channel: {}", self.channel);
 
@@ -119,7 +119,7 @@ impl<'a> ScanState<'a> {
             self.scan_one();
         } else {
             // we have complete one full scan cycle
-            info!(
+            trace!(
                 "scan round took: {}μs",
                 (self.timer.get_counter() - self.counter).to_micros()
             );
@@ -129,7 +129,7 @@ impl<'a> ScanState<'a> {
                 self.scan.calibrate(self.calibration);
                 self.calibration += 1;
             } else {
-                keys.update(&self.scan);
+                keys.update(&self.scan, hook);
             }
         }
     }
