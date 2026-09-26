@@ -106,7 +106,7 @@
         "hole_clearance": "error",
         "hole_to_hole": "ignore",
         "holes_co_located": "ignore",
-        "invalid_outline": "ignore",
+        "invalid_outline": "warning",
         "isolated_copper": "warning",
         "item_on_disabled_layer": "error",
         "items_not_allowed": "error",
@@ -595,7 +595,7 @@
       "plot": "output/gerber/",
       "pos_files": "",
       "specctra_dsn": "",
-      "step": "",
+      "step": "woodox.step",
       "svg": "",
       "vrml": ""
     },
