@@ -1,5 +1,7 @@
 use defmt::{Format, debug, info};
 
+use rp235x_hal::uart::UartDevice;
+use rp235x_hal::uart::ValidUartPinout;
 use usb_device::class_prelude::*;
 use usb_device::prelude::*;
 use usbd_human_interface_device::prelude::*;
@@ -62,7 +64,11 @@ where
         self.dev.state()
     }
 
-    pub fn tick(&mut self, keys: &mut KeyboardState, uart: &mut Uart) {
+    pub fn tick<D: UartDevice, P: ValidUartPinout<D>>(
+        &mut self,
+        keys: &mut KeyboardState,
+        uart: &mut Uart<D, P>,
+    ) {
         match self.initialized {
             UsbState::Initializing => {
                 if self.state() == UsbDeviceState::Configured {

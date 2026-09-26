@@ -42,7 +42,15 @@ mod app {
     use defmt::info;
     use embedded_hal::digital::InputPin;
     use fugit::MicrosDurationU32;
-    use rp235x_hal::Clock;
+    use rp235x_hal::{
+        Clock,
+        gpio::{
+            FunctionUart, Pin, PullDown,
+            bank0::{Gpio4, Gpio5},
+        },
+        pac::UART1,
+        uart::{UartDevice, ValidUartPinout},
+    };
     use usb_device::{bus::UsbBusAllocator, device::UsbDeviceState};
     use usbd_human_interface_device::page::Keyboard;
     use woodox_lib::{
@@ -59,7 +67,13 @@ mod app {
         #[lock_free]
         usb: Usb<UsbBus>,
         #[lock_free]
-        uart: Uart,
+        uart: Uart<
+            UART1,
+            (
+                Pin<Gpio4, FunctionUart, PullDown>,
+                Pin<Gpio5, FunctionUart, PullDown>,
+            ),
+        >,
         #[lock_free]
         alarm: Alarm0<CopyableTimer0>,
     }
@@ -220,10 +234,15 @@ mod app {
                 woodox_lib::matrix::KeyboardEvent::Layer(layer) => cx.shared.uart.send(Message::Layer(layer)),
             });
         } else {
-            scan.dma_completion(cx.shared.keys, |ev| {});
+            scan.dma_completion(cx.shared.keys, |ev| match ev {
+                woodox_lib::matrix::KeyboardEvent::Keycode(_, _, _) => (),
+                woodox_lib::matrix::KeyboardEvent::Layer(layer) => cx.shared.uart.send(Message::Layer(layer)),
+            });
         };
     }
 }
+
+
 
 hal::bsp_pins!(
     Gpio32 { name: mux_enable },

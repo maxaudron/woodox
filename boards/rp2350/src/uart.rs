@@ -5,39 +5,24 @@ use rp235x_hal::{
         bank0::{Gpio4, Gpio5},
     },
     pac::{RESETS, UART1},
-    uart::{DataBits, Enabled, StopBits, UartConfig, UartPeripheral},
+    uart::{DataBits, Enabled, StopBits, UartConfig, UartDevice, UartPeripheral, ValidUartPinout},
 };
 use usb_device::device::UsbDeviceState;
 use usbd_human_interface_device::page::Keyboard;
 
 use defmt::{Format, debug, error, info};
-use woodox_lib::matrix::KeyboardState;
+use woodox_lib::{layout::NUM_SWITCHES, matrix::KeyboardState};
 
-pub struct Uart {
-    pub uart: UartPeripheral<
-        Enabled,
-        UART1,
-        (
-            Pin<Gpio4, FunctionUart, PullDown>,
-            Pin<Gpio5, FunctionUart, PullDown>,
-        ),
-    >,
+pub struct Uart<D: UartDevice, P: ValidUartPinout<D>> {
+    pub uart: UartPeripheral<Enabled, D, P>,
 
     pub role: UartRole,
 
     pub initialized: bool,
 }
 
-impl Uart {
-    pub fn new(
-        pins: (
-            Pin<Gpio4, FunctionUart, PullDown>,
-            Pin<Gpio5, FunctionUart, PullDown>,
-        ),
-        resets: &mut RESETS,
-        uart1: UART1,
-        freq: HertzU32,
-    ) -> Self {
+impl<D: UartDevice, P: ValidUartPinout<D>> Uart<D, P> {
+    pub fn new(pins: P, resets: &mut RESETS, uart1: D, freq: HertzU32) -> Self {
         let mut uart = UartPeripheral::new(uart1, pins, resets)
             .enable(
                 // UartConfig::new(115200.Hz(), DataBits::Eight, None, StopBits::One),
@@ -107,7 +92,14 @@ impl Uart {
                     }
                 },
                 crate::uart::Message::Keycode((idx, layer, keycode)) => {
-                    keys.matrix[idx as usize * layer as usize * 2] = keycode
+                    debug!(
+                        "settings {:?} in matrix location {}:{} = {}",
+                        keycode,
+                        layer,
+                        idx,
+                        idx as usize * layer as usize + NUM_SWITCHES
+                    );
+                    keys.matrix[idx as usize * layer as usize + NUM_SWITCHES] = keycode
                 }
                 crate::uart::Message::Layer(layer) => keys.keymap.active_layer = layer as usize,
             }

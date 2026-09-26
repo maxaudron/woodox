@@ -102,7 +102,7 @@ impl KeyboardState {
         hook: &mut impl FnMut(KeyboardEvent),
     ) {
         let k = &mut self.matrix[index * layer];
-        if state.is_pressed() && *k == Keyboard::NoEventIndicated {
+        if state.is_pressed() && *k != keycode {
             *k = keycode;
             debug!("key pressed: {}:{} {:#X}", index, layer, keycode);
             hook(KeyboardEvent::Keycode(index as u8, layer as u8, keycode));
@@ -143,7 +143,7 @@ impl KeyboardState {
         for check_layer in (0..(self.keymap.active_layer + 1)).rev() {
             let index = s.index * (check_layer + 1);
             let layer = check_layer + 1;
-            match self.keymap.layers[check_layer][index] {
+            match self.keymap.layers[check_layer][s.index] {
                 Key::Keycode(keycode) => {
                     self.set_keycode(index, layer, s.state, keycode, hook);
                     return;
@@ -205,11 +205,11 @@ impl Keymap {
 
     /// Set `layer` active or inactive based on `state`
     pub fn set_layer(&mut self, state: SwitchState, layer: usize, hook: &mut impl FnMut(KeyboardEvent)) {
-        if state.is_pressed() {
+        if state.is_pressed() && self.active_layer != layer {
             self.active_layer = layer;
             debug!("layer activated: {:?}", layer);
             hook(KeyboardEvent::Layer(layer as u8))
-        } else {
+        } else if !state.is_pressed() && self.active_layer == layer {
             self.active_layer = 0;
             debug!("layer deactivated: {:?}", layer);
             hook(KeyboardEvent::Layer(0))
@@ -228,7 +228,7 @@ mod tests {
         let kc = Keyboard::A;
         let kcu = 0;
 
-        assert_eq!(state.matrix[kcu], kcn);
+        assert_eq!(state.matrix[KCU], KCN);
 
         state.set_keycode(kcu, 0, SwitchState::Pressed, kc, &mut |_| {});
         assert_eq!(state.matrix[kcu], kc);
