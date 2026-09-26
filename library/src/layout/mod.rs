@@ -45,6 +45,9 @@ macro_rules! key {
     (Key($key:tt)) => {
         Key::Keycode(Keyboard::$key)
     };
+    (Shift($key:tt)) => {
+        Key::Keycode(Keyboard::$key)
+    };
     ($k:tt($layer:literal, $key:tt)) => {
         Key::$k($layer, Keyboard::$key)
     };
