@@ -11,10 +11,7 @@
 //!
 //! This design was chosen as it does not incure any additional performance cost.
 
-use crate::{
-    layout::NUM_KEY_POSITIONS,
-    lg::{debug, trace},
-};
+use crate::{layout::NUM_KEY_POSITIONS, lg::debug};
 use usbd_human_interface_device::page::Keyboard;
 
 use crate::{
@@ -29,6 +26,8 @@ pub enum Key {
     ///
     /// See [`usbd_human_interface_device::page::Keyboard`] for full reference
     Keycode(Keyboard),
+    /// Emits a USB HID Keycode while also activating shift
+    Shift(Keyboard),
     /// Use [`Layer`] `n` while held.
     ///
     /// This position should be a [`Key::Trns`] key on [`Layer`] `n`
@@ -110,7 +109,11 @@ impl KeyboardState {
         } else if !state.is_pressed() && *k != Keyboard::NoEventIndicated {
             *k = Keyboard::NoEventIndicated;
             debug!("key released: {}:{} {:#X}", index, layer, keycode);
-            hook(KeyboardEvent::Keycode(index as u8, layer as u8, Keyboard::NoEventIndicated));
+            hook(KeyboardEvent::Keycode(
+                index as u8,
+                layer as u8,
+                Keyboard::NoEventIndicated,
+            ));
         }
     }
 
@@ -142,6 +145,11 @@ impl KeyboardState {
             let layer = check_layer + 1;
             match self.keymap.layers[check_layer][index] {
                 Key::Keycode(keycode) => {
+                    self.set_keycode(index, layer, s.state, keycode, hook);
+                    return;
+                }
+                Key::Shift(keycode) => {
+                    self.set_keycode(index, layer, s.state, Keyboard::LeftShift, hook);
                     self.set_keycode(index, layer, s.state, keycode, hook);
                     return;
                 }
