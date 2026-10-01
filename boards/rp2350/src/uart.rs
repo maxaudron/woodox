@@ -25,8 +25,7 @@ impl<D: UartDevice, P: ValidUartPinout<D>> Uart<D, P> {
     pub fn new(pins: P, resets: &mut RESETS, uart1: D, freq: HertzU32) -> Self {
         let mut uart = UartPeripheral::new(uart1, pins, resets)
             .enable(
-                // UartConfig::new(115200.Hz(), DataBits::Eight, None, StopBits::One),
-                UartConfig::new(9600.Hz(), DataBits::Eight, None, StopBits::One),
+                UartConfig::new(1_000_000.Hz(), DataBits::Eight, None, StopBits::One),
                 freq,
             )
             .unwrap();
