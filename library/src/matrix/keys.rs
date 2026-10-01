@@ -11,6 +11,8 @@
 //!
 //! This design was chosen as it does not incure any additional performance cost.
 
+use core::ops::{Deref, DerefMut};
+
 use crate::{layout::NUM_KEY_POSITIONS, lg::debug};
 use usbd_human_interface_device::page::Keyboard;
 
@@ -63,11 +65,14 @@ pub const NUM_KEYCODES: usize = 231 * 2;
 /// USB and maps the physical switch states to the logical keymap
 pub struct KeyboardState {
     pub matrix: [Keyboard; NUM_KEY_POSITIONS * NUM_LAYERS],
+    pub modifiers: [Modifiers; NUM_KEY_POSITIONS],
     pub keymap: Keymap,
 }
 
 pub enum KeyboardEvent {
     Keycode(u8, u8, Keyboard),
+    SetModifier(u8, Keyboard),
+    UnsetModifier(u8, Keyboard),
     Layer(u8),
 }
 
@@ -75,6 +80,7 @@ impl KeyboardState {
     pub fn new(keymap: Keymap) -> KeyboardState {
         KeyboardState {
             matrix: [Keyboard::NoEventIndicated; NUM_KEY_POSITIONS * NUM_LAYERS],
+            modifiers: [Modifiers(0); NUM_KEY_POSITIONS],
             keymap,
         }
     }
@@ -104,11 +110,11 @@ impl KeyboardState {
         let k = &mut self.matrix[index * layer];
         if state.is_pressed() && *k != keycode {
             *k = keycode;
-            debug!("key pressed: {}:{} {:#X}", index, layer, keycode);
+            debug!("key pressed: {}:{} {:?}", index, layer, keycode);
             hook(KeyboardEvent::Keycode(index as u8, layer as u8, keycode));
         } else if !state.is_pressed() && *k != Keyboard::NoEventIndicated {
             *k = Keyboard::NoEventIndicated;
-            debug!("key released: {}:{} {:#X}", index, layer, keycode);
+            debug!("key released: {}:{} {:?}", index, layer, keycode);
             hook(KeyboardEvent::Keycode(
                 index as u8,
                 layer as u8,
@@ -121,6 +127,25 @@ impl KeyboardState {
     pub fn set_oneshot_keycode(&mut self, index: usize, keycode: Keyboard) {
         self.matrix[index] = keycode;
         debug!("oneshot key pressed: {:#X}", keycode as u8)
+    }
+
+    pub fn set_modifier(
+        &mut self,
+        index: usize,
+        state: SwitchState,
+        keycode: Keyboard,
+        hook: &mut impl FnMut(KeyboardEvent),
+    ) {
+        let m = &mut self.modifiers[index];
+        if state.is_pressed() && !m.is_set(keycode) {
+            debug!("set modifier {} for {}", keycode, index);
+            hook(KeyboardEvent::SetModifier(index as u8, keycode));
+            m.set(keycode);
+        } else if !state.is_pressed() && m.is_set(keycode) {
+            debug!("unset modifier {} for {}", keycode, index);
+            hook(KeyboardEvent::UnsetModifier(index as u8, keycode));
+            m.unset(keycode);
+        }
     }
 
     // /// Key actions if they are held.
@@ -149,7 +174,7 @@ impl KeyboardState {
                     return;
                 }
                 Key::Shift(keycode) => {
-                    self.set_keycode(index, layer, s.state, Keyboard::LeftShift, hook);
+                    self.set_modifier(index, s.state, Keyboard::LeftShift, hook);
                     self.set_keycode(index, layer, s.state, keycode, hook);
                     return;
                 }
@@ -186,6 +211,112 @@ impl KeyboardState {
                 Key::Dead => return,
             }
         }
+    }
+
+    #[allow(unused)]
+    pub fn build_report(&self) -> [Keyboard; NUM_KEY_POSITIONS * NUM_LAYERS + 8] {
+        let mut modifiers = Modifiers(0);
+        for m in self.modifiers {
+            modifiers.0 |= m.0
+        }
+
+        let mut report = [Keyboard::NoEventIndicated; NUM_KEY_POSITIONS * NUM_LAYERS + 8];
+
+        report[0..8].copy_from_slice(&modifiers.to_report());
+        report[8..].copy_from_slice(&self.matrix);
+
+        report
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct Modifiers(u16);
+
+impl Modifiers {
+    const OFFSET: u16 = 0xE0;
+
+    pub fn set(&mut self, keycode: Keyboard) {
+        match keycode {
+            Keyboard::LeftControl
+            | Keyboard::RightControl
+            | Keyboard::LeftAlt
+            | Keyboard::RightAlt
+            | Keyboard::LeftShift
+            | Keyboard::RightShift
+            | Keyboard::LeftGUI
+            | Keyboard::RightGUI => {
+                let keycode = keycode as u16 - Self::OFFSET;
+                self.0 |= 1 << keycode
+            }
+            _ => unimplemented!(),
+        }
+    }
+
+    pub fn unset(&mut self, keycode: Keyboard) {
+        match keycode {
+            Keyboard::LeftControl
+            | Keyboard::RightControl
+            | Keyboard::LeftAlt
+            | Keyboard::RightAlt
+            | Keyboard::LeftShift
+            | Keyboard::RightShift
+            | Keyboard::LeftGUI
+            | Keyboard::RightGUI => {
+                let keycode = keycode as u16 - Self::OFFSET;
+                self.0 &= !(1 << keycode)
+            }
+            _ => unimplemented!(),
+        }
+    }
+
+    pub fn is_set(&self, keycode: Keyboard) -> bool {
+        let keycode = keycode as u16 - Self::OFFSET;
+        (self.0 & (1 << keycode)) >= 1
+    }
+
+    pub fn to_report(&self) -> [Keyboard; 8] {
+        let mut report = [Keyboard::NoEventIndicated; 8];
+
+        if self.is_set(Keyboard::LeftShift) {
+            report[0] = Keyboard::LeftShift;
+        }
+        if self.is_set(Keyboard::LeftControl) {
+            report[1] = Keyboard::LeftControl;
+        }
+        if self.is_set(Keyboard::LeftAlt) {
+            report[2] = Keyboard::LeftAlt;
+        }
+        if self.is_set(Keyboard::LeftGUI) {
+            report[3] = Keyboard::LeftGUI;
+        }
+        if self.is_set(Keyboard::RightShift) {
+            report[4] = Keyboard::RightShift;
+        }
+        if self.is_set(Keyboard::RightControl) {
+            report[5] = Keyboard::RightControl;
+        }
+        if self.is_set(Keyboard::RightAlt) {
+            report[6] = Keyboard::RightAlt;
+        }
+        if self.is_set(Keyboard::RightGUI) {
+            report[7] = Keyboard::RightGUI;
+        }
+
+        report
+    }
+}
+
+impl DerefMut for Modifiers {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+impl Deref for Modifiers {
+    type Target = u16;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
 
@@ -228,12 +359,32 @@ mod tests {
         let kc = Keyboard::A;
         let kcu = 0;
 
-        assert_eq!(state.matrix[KCU], KCN);
+        assert_eq!(state.matrix[kcu], kcn);
 
         state.set_keycode(kcu, 0, SwitchState::Pressed, kc, &mut |_| {});
         assert_eq!(state.matrix[kcu], kc);
 
         state.set_keycode(kcu, 0, SwitchState::Unpressed, kc, &mut |_| {});
         assert_eq!(state.matrix[kcu], kcn);
+    }
+
+    #[test]
+    fn set_modifier() {
+        let mut modifier = Modifiers(0);
+
+        modifier.set(Keyboard::LeftShift);
+        assert_eq!(modifier.0, 0b0010);
+
+        modifier.set(Keyboard::LeftGUI);
+        assert_eq!(modifier.0, 0b1010);
+
+        modifier.set(Keyboard::RightGUI);
+        assert_eq!(modifier.0, 0b10001010);
+
+        modifier.unset(Keyboard::LeftShift);
+        assert_eq!(modifier.0, 0b10001000);
+
+        assert!(modifier.is_set(Keyboard::LeftGUI));
+        assert!(!modifier.is_set(Keyboard::LeftShift));
     }
 }

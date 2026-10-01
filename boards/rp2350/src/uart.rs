@@ -65,7 +65,7 @@ impl<D: UartDevice, P: ValidUartPinout<D>> Uart<D, P> {
         if let Some(msg) = self.read() {
             info!("received msg over uart: {:?}", msg);
             match msg {
-                crate::uart::Message::Init(role) => match role {
+                Message::Init(role) => match role {
                     UartRole::Setup => unimplemented!(),
                     UartRole::Primary => {
                         self.send(Message::InitAck(UartRole::Secondary));
@@ -77,7 +77,7 @@ impl<D: UartDevice, P: ValidUartPinout<D>> Uart<D, P> {
                         }
                     }
                 },
-                crate::uart::Message::InitAck(role) => match role {
+                Message::InitAck(role) => match role {
                     UartRole::Setup => todo!(),
                     UartRole::Primary => {
                         self.role = UartRole::Secondary;
@@ -90,7 +90,7 @@ impl<D: UartDevice, P: ValidUartPinout<D>> Uart<D, P> {
                         self.initialized = true;
                     }
                 },
-                crate::uart::Message::Keycode((idx, layer, keycode)) => {
+                Message::Keycode((idx, layer, keycode)) => {
                     debug!(
                         "settings {:?} in matrix location {}:{} = {}",
                         keycode,
@@ -100,7 +100,16 @@ impl<D: UartDevice, P: ValidUartPinout<D>> Uart<D, P> {
                     );
                     keys.matrix[idx as usize * layer as usize + NUM_SWITCHES] = keycode
                 }
-                crate::uart::Message::Layer(layer) => keys.keymap.active_layer = layer as usize,
+                Message::Layer(layer) => keys.keymap.active_layer = layer as usize,
+                Message::Modifier(set, index, keycode) => {
+                    let state = if set {
+                        woodox_lib::matrix::SwitchState::Pressed
+                    } else {
+                        woodox_lib::matrix::SwitchState::Unpressed
+                    };
+
+                    keys.set_modifier(index as usize, state, keycode, &mut |_| {});
+                }
             }
         }
     }
@@ -128,6 +137,7 @@ pub enum Message {
 
     /// Secondary -> Primary
     Keycode(KeyID) = 0x2,
+    Modifier(bool, u8, Keyboard) = 0x3,
 
     /// Primary -> Secondary
     Layer(u8) = 0x4,

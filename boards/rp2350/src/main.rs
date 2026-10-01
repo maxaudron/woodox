@@ -232,17 +232,27 @@ mod app {
                     cx.shared.uart.send(Message::Keycode((idx, layer, key)))
                 }
                 woodox_lib::matrix::KeyboardEvent::Layer(layer) => cx.shared.uart.send(Message::Layer(layer)),
+                woodox_lib::matrix::KeyboardEvent::SetModifier(index, keycode) => {
+                    cx.shared.uart.send(Message::Modifier(true, index, keycode))
+                }
+                woodox_lib::matrix::KeyboardEvent::UnsetModifier(index, keycode) => {
+                    cx.shared.uart.send(Message::Modifier(false, index, keycode))
+                }
             });
         } else {
             scan.dma_completion(cx.shared.keys, |ev| match ev {
                 woodox_lib::matrix::KeyboardEvent::Keycode(_, _, _) => (),
                 woodox_lib::matrix::KeyboardEvent::Layer(layer) => cx.shared.uart.send(Message::Layer(layer)),
+                woodox_lib::matrix::KeyboardEvent::SetModifier(index, keycode) => {
+                    cx.shared.uart.send(Message::Modifier(true, index, keycode))
+                }
+                woodox_lib::matrix::KeyboardEvent::UnsetModifier(index, keycode) => {
+                    cx.shared.uart.send(Message::Modifier(false, index, keycode))
+                }
             });
         };
     }
 }
-
-
 
 hal::bsp_pins!(
     Gpio32 { name: mux_enable },

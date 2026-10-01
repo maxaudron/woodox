@@ -91,7 +91,7 @@ where
             UsbState::Disconnected => return,
         }
 
-        match self.hid.device().write_report(keys.matrix) {
+        match self.hid.device().write_report(keys.build_report()) {
             Err(UsbHidError::WouldBlock) => {
                 // info!("usb would block")
             }
