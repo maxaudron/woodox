@@ -129,7 +129,8 @@ impl<'a> ScanState<'a> {
                 self.scan.calibrate(self.calibration);
                 self.calibration += 1;
             } else {
-                keys.update(&self.scan, hook);
+                let report = keys.build_report(self.scan.scans.into_iter().flatten(), hook);
+                // keys.update(&self.scan, hook);
             }
         }
     }

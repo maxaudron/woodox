@@ -232,11 +232,13 @@ mod app {
                     cx.shared.uart.send(Message::Keycode((idx, layer, key)))
                 }
                 woodox_lib::matrix::KeyboardEvent::Layer(layer) => cx.shared.uart.send(Message::Layer(layer)),
+                woodox_lib::matrix::KeyboardEvent::Report(report) => cx.shared.uart.send(Message::Report(report)),
             });
         } else {
             scan.dma_completion(cx.shared.keys, |ev| match ev {
                 woodox_lib::matrix::KeyboardEvent::Keycode(_, _, _) => (),
                 woodox_lib::matrix::KeyboardEvent::Layer(layer) => cx.shared.uart.send(Message::Layer(layer)),
+                woodox_lib::matrix::KeyboardEvent::Report(report) => cx.shared.uart.send(Message::Report(report)),
             });
         };
     }

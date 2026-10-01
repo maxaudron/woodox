@@ -11,8 +11,9 @@
 //!
 //! This design was chosen as it does not incure any additional performance cost.
 
-use crate::{layout::NUM_KEY_POSITIONS, lg::debug};
-use usbd_human_interface_device::page::Keyboard;
+use crate::{layout::NUM_KEY_POSITIONS, lg::debug, matrix::Switch};
+use packed_struct::PackedStruct;
+use usbd_human_interface_device::{device::keyboard::NKROBootKeyboardReport, page::Keyboard};
 
 use crate::{
     layout::NUM_SWITCHES,
@@ -64,11 +65,13 @@ pub const NUM_KEYCODES: usize = 231 * 2;
 pub struct KeyboardState {
     pub matrix: [Keyboard; NUM_KEY_POSITIONS * NUM_LAYERS],
     pub keymap: Keymap,
+    pub report: NKROBootKeyboardReport,
 }
 
 pub enum KeyboardEvent {
     Keycode(u8, u8, Keyboard),
     Layer(u8),
+    Report([u8; 25])
 }
 
 impl KeyboardState {
@@ -76,6 +79,7 @@ impl KeyboardState {
         KeyboardState {
             matrix: [Keyboard::NoEventIndicated; NUM_KEY_POSITIONS * NUM_LAYERS],
             keymap,
+            report: NKROBootKeyboardReport::default(),
         }
     }
 
@@ -186,6 +190,89 @@ impl KeyboardState {
                 Key::Dead => return,
             }
         }
+    }
+
+    #[allow(unused)]
+    pub fn build_report(
+        &mut self,
+        switches: impl Iterator<Item = Switch>,
+        mut hook: impl FnMut(KeyboardEvent),
+    ) -> [u8; 25] {
+        let mut report = NKROBootKeyboardReport::default();
+
+        for switch in switches {
+            for layer in (0..=(self.keymap.active_layer)).rev() {
+                let key = &self.keymap.layers[layer][switch.index];
+
+                match *key {
+                    Key::Keycode(keycode) => {
+                        report.set_keycode(keycode);
+                        break;
+                    }
+                    Key::Shift(keycode) => {
+                        report.set_keycode(Keyboard::LeftShift);
+                        report.set_keycode(keycode);
+                        break;
+                    }
+                    Key::Layer(set_layer) => {
+                        self.keymap.set_layer(switch.state, set_layer, &mut hook);
+                        break;
+                    }
+                    Key::LayerTap(layer, keycode) => continue,
+                    Key::KeyTap(held, tap) => continue,
+                    Key::GrvEsc => {
+                        if self.report.left_shift || self.report.right_shift {
+                            report.set_keycode(Keyboard::Grave);
+                        } else {
+                            report.set_keycode(Keyboard::Escape);
+                        }
+                    },
+                    Key::Trns => continue,
+                    Key::Dead => break,
+                }
+            }
+        }
+
+        self.report = report;
+        let report = report.pack().unwrap();
+        hook(KeyboardEvent::Report(report));
+        report
+    }
+}
+
+
+
+pub trait KeyboardReport {
+    fn set_keycode(&mut self, keycode: Keyboard);
+    fn merge(&mut self, report: Self);
+}
+
+impl KeyboardReport for NKROBootKeyboardReport {
+    fn set_keycode(&mut self, keycode: Keyboard) {
+        match keycode {
+            Keyboard::LeftShift => self.left_shift = true,
+            Keyboard::RightShift => self.right_shift = true,
+            Keyboard::LeftGUI => self.left_gui = true,
+            Keyboard::RightGUI => self.right_gui = true,
+            Keyboard::LeftControl => self.left_ctrl = true,
+            Keyboard::RightControl => self.right_ctrl = true,
+            Keyboard::LeftAlt => self.left_alt = true,
+            Keyboard::RightAlt => self.right_alt = true,
+            _ => self.nkro_keys[keycode as usize / 8] |= 1 << (keycode as u8 % 8),
+        }
+    }
+
+    fn merge(&mut self, report: Self) {
+        self.right_shift |= report.right_shift;
+        self.left_shift |= report.left_shift;
+        self.right_ctrl |= report.right_ctrl;
+        self.left_ctrl |= report.left_ctrl;
+        self.right_alt |= report.right_alt;
+        self.left_alt |= report.left_alt;
+        self.right_gui |= report.right_gui;
+        self.left_gui |= report.left_gui;
+
+        self.nkro_keys.iter_mut().enumerate().for_each(|(i, n)| *n |= report.nkro_keys[i]);
     }
 }
 

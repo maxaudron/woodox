@@ -1,4 +1,5 @@
 use fugit::{HertzU32, RateExtU32};
+use packed_struct::PackedStruct;
 use rp235x_hal::{
     gpio::{
         FunctionUart, Pin, PullDown,
@@ -8,10 +9,13 @@ use rp235x_hal::{
     uart::{DataBits, Enabled, StopBits, UartConfig, UartDevice, UartPeripheral, ValidUartPinout},
 };
 use usb_device::device::UsbDeviceState;
-use usbd_human_interface_device::page::Keyboard;
+use usbd_human_interface_device::{device::keyboard::NKROBootKeyboardReport, page::Keyboard};
 
 use defmt::{Format, debug, error, info};
-use woodox_lib::{layout::NUM_SWITCHES, matrix::KeyboardState};
+use woodox_lib::{
+    layout::NUM_SWITCHES,
+    matrix::{KeyboardReport, KeyboardState},
+};
 
 pub struct Uart<D: UartDevice, P: ValidUartPinout<D>> {
     pub uart: UartPeripheral<Enabled, D, P>,
@@ -48,7 +52,7 @@ impl<D: UartDevice, P: ValidUartPinout<D>> Uart<D, P> {
     }
 
     pub fn read(&mut self) -> Option<Message> {
-        let mut b: [u8; 4] = [0; 4];
+        let mut b: [u8; MSG_SIZE] = [0; MSG_SIZE];
         match self.uart.read_raw(&mut b) {
             Ok(n) => {
                 debug!("received {} bytes over uart: {:x}", n, b);
@@ -101,6 +105,9 @@ impl<D: UartDevice, P: ValidUartPinout<D>> Uart<D, P> {
                     keys.matrix[idx as usize * layer as usize + NUM_SWITCHES] = keycode
                 }
                 crate::uart::Message::Layer(layer) => keys.keymap.active_layer = layer as usize,
+                crate::uart::Message::Report(report) => keys
+                    .report
+                    .merge(NKROBootKeyboardReport::unpack(&report).unwrap()),
             }
         }
     }
@@ -131,6 +138,8 @@ pub enum Message {
 
     /// Primary -> Secondary
     Layer(u8) = 0x4,
+
+    Report([u8; 25]),
 }
 
 const MSG_SIZE: usize = core::mem::size_of::<Message>(); // 4

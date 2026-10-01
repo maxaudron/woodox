@@ -1,5 +1,6 @@
 use defmt::{Format, debug, info};
 
+use packed_struct::PackedStruct;
 use rp235x_hal::uart::UartDevice;
 use rp235x_hal::uart::ValidUartPinout;
 use usb_device::class_prelude::*;
@@ -91,13 +92,13 @@ where
             UsbState::Disconnected => return,
         }
 
-        match self.hid.device().write_report(keys.matrix) {
-            Err(UsbHidError::WouldBlock) => {
+        match self.hid.device().interface().write_report(&keys.report.pack().unwrap()) {
+            Err(UsbError::WouldBlock) => {
                 // info!("usb would block")
             }
-            Err(UsbHidError::Duplicate) => {
-                // info!("usb duplicate")
-            }
+            // Err(UsbError::Duplicate) => {
+            //     // info!("usb duplicate")
+            // }
             Ok(_) => {
                 // info!("usb write ok")
             }
